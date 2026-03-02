@@ -1,0 +1,519 @@
+---
+title: Project Structure
+description: Understanding the file and folder organization of the Tendon template
+---
+
+The Tendon template follows Next.js App Router conventions with a clean, organized structure. This guide explains the purpose of each directory and key files.
+
+## Directory Overview
+
+```
+tendon/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   ├── globals.css        # Global styles and theme
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx           # Homepage
+├── components/            # React components
+│   └── ui/               # shadcn/ui components
+├── drizzle/              # Database migrations
+├── hooks/                # Custom React hooks
+├── lib/                  # Core utilities and configs
+│   ├── db/              # Database schema and types
+│   ├── auth.ts          # Better Auth server config
+│   ├── auth-client.ts   # Better Auth client
+│   ├── db.ts            # Drizzle database client
+│   └── utils.ts         # Utility functions
+├── .env.example          # Environment variable template
+├── components.json       # shadcn/ui configuration
+├── drizzle.config.ts     # Drizzle ORM configuration
+├── next.config.ts        # Next.js configuration
+├── package.json          # Dependencies and scripts
+└── tsconfig.json         # TypeScript configuration
+```
+
+## Core Directories
+
+### `app/` - Application Routes
+
+The `app` directory follows Next.js App Router conventions. Each folder represents a route.
+
+#### `app/layout.tsx`
+
+The root layout wraps all pages:
+
+```typescript
+import type { Metadata } from "next";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "Tendon Next.js Template",
+  description: "Next.js + Better Auth + Turso starter",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className={`${GeistSans.variable} ${GeistMono.variable}`}>
+        {children}
+      </body>
+    </html>
+  );
+}
+```
+
+**Key features:**
+- Metadata configuration for SEO
+- Font loading with Geist Sans and Geist Mono
+- Global CSS imports
+
+#### `app/page.tsx`
+
+The homepage component (accessible at `/`):
+
+```typescript
+export default function HomePage() {
+  return (
+    <main>
+      {/* Your homepage content */}
+    </main>
+  );
+}
+```
+
+#### `app/globals.css`
+
+Global styles, theme configuration, and Tailwind imports. See [Customization](/guides/customization#styling-and-theming) for details.
+
+### `app/api/` - API Routes
+
+API routes are server-side endpoints accessible via HTTP requests.
+
+#### `app/api/auth/[...all]/route.ts`
+
+The catch-all route handler for Better Auth:
+
+```typescript
+import { toNextJsHandler } from "better-auth/next-js";
+import { auth } from "@/lib/auth";
+
+export const runtime = "nodejs";
+
+export const { GET, POST } = toNextJsHandler(auth);
+```
+
+**Handles endpoints:**
+- `/api/auth/sign-in` - Sign in
+- `/api/auth/sign-up` - Sign up
+- `/api/auth/sign-out` - Sign out
+- `/api/auth/session` - Get current session
+- And more...
+
+**Adding custom API routes:**
+
+```typescript
+// app/api/posts/route.ts
+import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { posts } from "@/lib/db/schema";
+
+export async function GET() {
+  const allPosts = await db.select().from(posts);
+  return NextResponse.json(allPosts);
+}
+
+export async function POST(request: Request) {
+  const body = await request.json();
+  const newPost = await db.insert(posts).values(body);
+  return NextResponse.json(newPost);
+}
+```
+
+### `components/` - React Components
+
+Reusable React components organized by purpose.
+
+#### `components/ui/` - shadcn/ui Components
+
+Pre-built, customizable UI components:
+
+- **Form components:** `button.tsx`, `input.tsx`, `select.tsx`, `checkbox.tsx`
+- **Layout components:** `card.tsx`, `separator.tsx`, `sheet.tsx`, `sidebar.tsx`
+- **Feedback components:** `alert.tsx`, `dialog.tsx`, `toast.tsx`, `spinner.tsx`
+- **Data display:** `table.tsx`, `chart.tsx`, `avatar.tsx`, `badge.tsx`
+
+All components are fully typed and use the theme from `globals.css`.
+
+**Example component import:**
+
+```typescript
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
+function MyComponent() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Hello</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Button>Click me</Button>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+**Adding custom components:**
+
+Place your own components alongside or in subdirectories:
+
+```
+components/
+├── ui/              # shadcn/ui components
+├── auth/            # Auth-related components
+│   └── sign-in-form.tsx
+├── posts/           # Post-related components
+│   └── post-card.tsx
+└── layout/          # Layout components
+    ├── header.tsx
+    └── footer.tsx
+```
+
+### `lib/` - Core Library Code
+
+Core application logic, configurations, and utilities.
+
+#### `lib/auth.ts` - Better Auth Server Config
+
+Server-side auth configuration. See [Configuration](/guides/configuration#better-auth-configuration).
+
+**Location:** `lib/auth.ts`
+
+**Exports:** `auth` (Better Auth instance)
+
+#### `lib/auth-client.ts` - Better Auth Client
+
+Client-side auth methods for React components.
+
+**Location:** `lib/auth-client.ts`
+
+**Exports:** `authClient`
+
+**Usage:**
+
+```typescript
+import { authClient } from "@/lib/auth-client";
+
+const { data: session } = authClient.useSession();
+
+await authClient.signIn.email({
+  email: "user@example.com",
+  password: "password",
+});
+```
+
+#### `lib/db.ts` - Database Client
+
+Drizzle ORM client for database operations.
+
+**Location:** `lib/db.ts`
+
+**Exports:** `db`
+
+**Usage:**
+
+```typescript
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+
+const users = await db.select().from(user);
+const john = await db.select().from(user).where(eq(user.email, "john@example.com"));
+```
+
+#### `lib/db/schema.ts` - Database Schema
+
+Drizzle ORM schema definitions for all database tables.
+
+**Location:** `lib/db/schema.ts`
+
+**Tables:**
+- `user` - User accounts
+- `session` - Active sessions
+- `account` - Auth provider accounts (email/password, OAuth, etc.)
+- `verification` - Email verification tokens
+
+**Exports:**
+- Table definitions (`user`, `session`, `account`, `verification`)
+- Relations (`userRelations`, `sessionRelations`, `accountRelations`)
+
+See [Customization](/guides/customization#modifying-the-database-schema) for how to extend the schema.
+
+#### `lib/utils.ts` - Utility Functions
+
+Helper functions, including `cn()` for class name merging:
+
+```typescript
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+```
+
+**Usage:**
+
+```typescript
+import { cn } from "@/lib/utils";
+
+const className = cn(
+  "base-class",
+  condition && "conditional-class",
+  "text-red-500",
+);
+```
+
+### `hooks/` - Custom React Hooks
+
+Reusable React hooks.
+
+#### `hooks/use-mobile.ts`
+
+Detects mobile viewport:
+
+```typescript
+import { useMobile } from "@/hooks/use-mobile";
+
+function MyComponent() {
+  const isMobile = useMobile();
+  
+  return <div>{isMobile ? "Mobile" : "Desktop"}</div>;
+}
+```
+
+**Add your own hooks:**
+
+```typescript
+// hooks/use-user.ts
+import { authClient } from "@/lib/auth-client";
+
+export function useUser() {
+  const { data: session } = authClient.useSession();
+  return session?.user;
+}
+```
+
+### `drizzle/` - Database Migrations
+
+Generated SQL migration files. Created automatically when you run:
+
+```bash
+pnpm db:generate
+```
+
+**Structure:**
+
+```
+drizzle/
+├── 0000_initial_migration.sql
+├── 0001_add_posts_table.sql
+└── meta/
+    └── _journal.json
+```
+
+<Warning>
+  Don't manually edit migration files. Always modify `lib/db/schema.ts` and regenerate migrations.
+</Warning>
+
+## Configuration Files
+
+### `drizzle.config.ts`
+
+Drizzle ORM configuration. See [Configuration](/guides/configuration#database-configuration).
+
+### `next.config.ts`
+
+Next.js configuration. See [Configuration](/guides/configuration#nextjs-configuration).
+
+### `components.json`
+
+shadcn/ui configuration:
+
+```json
+{
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "css": "app/globals.css",
+    "baseColor": "stone",
+    "cssVariables": true
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  }
+}
+```
+
+**Key settings:**
+- `style`: Component style variant (`new-york` or `default`)
+- `baseColor`: Base color scheme (`stone`, `slate`, `zinc`, etc.)
+- `aliases`: Import path aliases
+
+### `tsconfig.json`
+
+TypeScript configuration with path aliases:
+
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}
+```
+
+This enables imports like `@/components/ui/button` instead of `../../components/ui/button`.
+
+### `package.json`
+
+Dependencies and npm scripts:
+
+**Key scripts:**
+
+```json
+{
+  "scripts": {
+    "dev": "vinext dev",
+    "build": "vinext build",
+    "start": "vinext start",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "auth:generate": "pnpm dlx @better-auth/cli@latest generate --yes --output ./lib/db/schema.ts",
+    "db:setup": "pnpm auth:generate && pnpm db:generate && pnpm db:migrate"
+  }
+}
+```
+
+## Routing Structure
+
+Next.js App Router uses file-system based routing:
+
+| File | Route | Description |
+|------|-------|-------------|
+| `app/page.tsx` | `/` | Homepage |
+| `app/about/page.tsx` | `/about` | About page |
+| `app/blog/page.tsx` | `/blog` | Blog index |
+| `app/blog/[slug]/page.tsx` | `/blog/post-1` | Dynamic blog post |
+| `app/api/auth/[...all]/route.ts` | `/api/auth/*` | Auth API routes |
+| `app/dashboard/layout.tsx` | `/dashboard/*` | Dashboard layout |
+
+**Creating new routes:**
+
+```bash
+# Create a new page
+mkdir app/about
+touch app/about/page.tsx
+
+# Create a dynamic route
+mkdir -p app/blog/[slug]
+touch app/blog/[slug]/page.tsx
+
+# Create an API route
+mkdir -p app/api/posts
+touch app/api/posts/route.ts
+```
+
+## File Naming Conventions
+
+- **Pages:** `page.tsx` (required for routes)
+- **Layouts:** `layout.tsx` (wraps child pages)
+- **Loading states:** `loading.tsx` (shown while page loads)
+- **Error boundaries:** `error.tsx` (handles errors)
+- **Not found:** `not-found.tsx` (404 page)
+- **Route handlers:** `route.ts` (API endpoints)
+- **Components:** `kebab-case.tsx` (e.g., `user-profile.tsx`)
+- **Utilities:** `kebab-case.ts` (e.g., `format-date.ts`)
+
+## Best Practices
+
+<Steps>
+  <Step title="Organize by feature">
+    Group related components, hooks, and utilities by feature when your app grows:
+    
+    ```
+    app/
+    ├── (auth)/
+    │   ├── sign-in/page.tsx
+    │   └── sign-up/page.tsx
+    ├── (dashboard)/
+    │   ├── layout.tsx
+    │   ├── page.tsx
+    │   └── settings/page.tsx
+    ```
+  </Step>
+  
+  <Step title="Use path aliases">
+    Always use `@/` imports instead of relative paths:
+    
+    ```typescript
+    // Good
+    import { Button } from "@/components/ui/button";
+    
+    // Avoid
+    import { Button } from "../../components/ui/button";
+    ```
+  </Step>
+  
+  <Step title="Colocate related files">
+    Keep components, styles, and tests close together:
+    
+    ```
+    components/
+    └── user-profile/
+        ├── user-profile.tsx
+        ├── user-profile.test.tsx
+        └── user-avatar.tsx
+    ```
+  </Step>
+  
+  <Step title="Separate server and client code">
+    Mark client components with `"use client"` and keep server logic in separate files:
+    
+    ```typescript
+    // components/client-button.tsx
+    "use client";
+    
+    import { useState } from "react";
+    
+    export function ClientButton() {
+      const [count, setCount] = useState(0);
+      // ...
+    }
+    ```
+  </Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Configuration" icon="gear" href="/guides/configuration">
+    Configure environment variables and settings
+  </Card>
+  <Card title="Customization" icon="palette" href="/guides/customization">
+    Customize the template for your needs
+  </Card>
+</CardGroup>

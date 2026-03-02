@@ -1,0 +1,238 @@
+---
+title: UI Components Overview
+description: Complete guide to the shadcn/ui component library in Tendon
+icon: 'boxes'
+---
+
+Tendon comes with a comprehensive UI component library built on top of **shadcn/ui**, featuring 55+ pre-built, accessible components styled with Tailwind CSS.
+
+## Component Library
+
+All components are built using:
+
+- **Radix UI** primitives for accessibility
+- **Tailwind CSS** for styling
+- **class-variance-authority (CVA)** for variant management
+- **TypeScript** for type safety
+- **New York** style variant
+
+## Configuration
+
+The component library is configured in `components.json`:
+
+```json
+{
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "baseColor": "stone",
+    "cssVariables": true
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui"
+  }
+}
+```
+
+## Available Components
+
+<CardGroup cols={3}>
+  <Card title="Button" icon="rectangle-ad" href="/components/button">
+    Interactive buttons with multiple variants and sizes
+  </Card>
+  <Card title="Card" icon="square" href="/components/card">
+    Flexible container for grouping content
+  </Card>
+  <Card title="Form" icon="input-text" href="/components/form">
+    Form components with validation support
+  </Card>
+  <Card title="Input" icon="input-cursor" href="/components/input">
+    Text input fields with accessibility features
+  </Card>
+  <Card title="Dialog" icon="window" href="/components/dialog">
+    Modal dialogs and overlays
+  </Card>
+  <Card title="Dropdown Menu" icon="bars" href="/components/dropdown-menu">
+    Contextual menus with multiple options
+  </Card>
+  <Card title="Tabs" icon="folder-tabs" href="/components/tabs">
+    Organize content in tabbed interfaces
+  </Card>
+  <Card title="Table" icon="table" href="/components/table">
+    Data tables with sorting and filtering
+  </Card>
+  <Card title="Toast" icon="bell" href="/components/toast">
+    Toast notifications with Sonner
+  </Card>
+</CardGroup>
+
+## All Components
+
+### Form & Input
+- **Button** - Interactive buttons with variants
+- **Input** - Text input fields
+- **Textarea** - Multi-line text input
+- **Select** - Dropdown select menus
+- **Checkbox** - Checkbox inputs
+- **Radio Group** - Radio button groups
+- **Switch** - Toggle switches
+- **Form** - Form field wrapper with validation
+- **Label** - Form labels
+- **Combobox** - Searchable select component
+- **Input OTP** - One-time password input
+- **Native Select** - Native HTML select
+- **Input Group** - Grouped input components
+- **Field** - Form field container
+
+### Layout & Structure
+- **Card** - Content containers
+- **Separator** - Visual dividers
+- **Aspect Ratio** - Maintain aspect ratios
+- **Scroll Area** - Custom scrollable areas
+- **Resizable** - Resizable panels
+- **Sidebar** - Navigation sidebar
+
+### Navigation
+- **Tabs** - Tabbed interfaces
+- **Navigation Menu** - Main navigation menus
+- **Breadcrumb** - Breadcrumb navigation
+- **Pagination** - Page navigation
+- **Menubar** - Menu bar component
+
+### Overlays
+- **Dialog** - Modal dialogs
+- **Sheet** - Side sheets
+- **Drawer** - Drawer overlays
+- **Popover** - Popover content
+- **Hover Card** - Hover-triggered cards
+- **Tooltip** - Tooltips
+- **Alert Dialog** - Alert dialogs
+
+### Data Display
+- **Table** - Data tables
+- **Avatar** - User avatars
+- **Badge** - Status badges
+- **Alert** - Alert messages
+- **Progress** - Progress bars
+- **Skeleton** - Loading skeletons
+- **Spinner** - Loading spinners
+- **Chart** - Chart components
+- **Calendar** - Date picker calendar
+- **Empty** - Empty states
+
+### Interactive
+- **Dropdown Menu** - Dropdown menus
+- **Context Menu** - Context menus
+- **Command** - Command palette
+- **Carousel** - Image carousels
+- **Collapsible** - Collapsible content
+- **Toggle** - Toggle buttons
+- **Toggle Group** - Toggle button groups
+- **Slider** - Range sliders
+- **Kbd** - Keyboard shortcuts
+
+### Feedback
+- **Toast** - Toast notifications (Sonner)
+- **Sonner** - Toast notification system
+
+### Utility
+- **Button Group** - Grouped buttons
+- **Item** - Generic item component
+- **Direction** - RTL/LTR direction
+
+## Usage Pattern
+
+All components follow a consistent import pattern:
+
+```tsx
+import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+
+export default function Example() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Welcome</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Input placeholder="Enter your name" />
+        <Button>Submit</Button>
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+## Adding New Components
+
+You can add additional shadcn/ui components using the CLI:
+
+```bash
+npx shadcn@latest add [component-name]
+```
+
+For example, to add the accordion component:
+
+```bash
+npx shadcn@latest add accordion
+```
+
+## Customization
+
+Components use CSS variables defined in `app/globals.css` for theming:
+
+```css
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 20 14.3% 4.1%;
+    --primary: 24 9.8% 10%;
+    /* ... */
+  }
+}
+```
+
+## Component Features
+
+### Accessibility
+- Built on Radix UI primitives
+- Full keyboard navigation
+- ARIA attributes
+- Focus management
+
+### Dark Mode
+- Automatic dark mode support
+- CSS variable-based theming
+- Seamless theme switching
+
+### TypeScript
+- Full type safety
+- IntelliSense support
+- Type inference
+
+### Responsive
+- Mobile-first design
+- Responsive variants
+- Touch-friendly interactions
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Button Component" icon="rectangle-ad" href="/components/button">
+    Learn about button variants and usage
+  </Card>
+  <Card title="Form Components" icon="input-text" href="/components/form">
+    Build forms with validation
+  </Card>
+  <Card title="Customization Guide" icon="palette" href="/guides/customization">
+    Customize component styles and theming
+  </Card>
+  <Card title="UI Components" icon="blocks" href="/features/ui-components">
+    Explore all available components
+  </Card>
+</CardGroup>

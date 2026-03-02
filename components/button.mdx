@@ -1,0 +1,402 @@
+---
+title: Button
+description: Interactive button component with multiple variants, sizes, and states
+icon: 'rectangle-ad'
+---
+
+The Button component provides a versatile, accessible button with support for multiple variants, sizes, and states. Built with Radix UI's Slot component for composition.
+
+## Installation
+
+The Button component is included by default. To add it to a new project:
+
+```bash
+npx shadcn@latest add button
+```
+
+## Import
+
+```tsx
+import { Button } from "@/components/ui/button"
+```
+
+## Usage
+
+### Basic Button
+
+```tsx
+import { Button } from "@/components/ui/button"
+
+export default function Example() {
+  return <Button>Click me</Button>
+}
+```
+
+### With Icon
+
+```tsx
+import { Button } from "@/components/ui/button"
+import { MailIcon } from "lucide-react"
+
+export default function Example() {
+  return (
+    <Button>
+      <MailIcon />
+      Send Email
+    </Button>
+  )
+}
+```
+
+## Variants
+
+The Button component supports 6 visual variants:
+
+<Tabs>
+  <Tab title="Preview">
+    ```tsx
+    <Button variant="default">Default</Button>
+    <Button variant="destructive">Destructive</Button>
+    <Button variant="outline">Outline</Button>
+    <Button variant="secondary">Secondary</Button>
+    <Button variant="ghost">Ghost</Button>
+    <Button variant="link">Link</Button>
+    ```
+  </Tab>
+  <Tab title="Code">
+    ```tsx
+    // components/ui/button.tsx
+    variant: {
+      default: "bg-primary text-primary-foreground hover:bg-primary/90",
+      destructive: "bg-destructive text-white hover:bg-destructive/90",
+      outline: "border bg-background shadow-xs hover:bg-accent",
+      secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+      ghost: "hover:bg-accent hover:text-accent-foreground",
+      link: "text-primary underline-offset-4 hover:underline",
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Default
+
+The primary button style with solid background.
+
+```tsx
+<Button variant="default">Default</Button>
+```
+
+### Destructive
+
+For dangerous or destructive actions like deleting data.
+
+```tsx
+<Button variant="destructive">Delete Account</Button>
+```
+
+### Outline
+
+Outlined button with transparent background.
+
+```tsx
+<Button variant="outline">Cancel</Button>
+```
+
+### Secondary
+
+Secondary actions with muted styling.
+
+```tsx
+<Button variant="secondary">Learn More</Button>
+```
+
+### Ghost
+
+Minimal styling, useful for icon buttons or subtle actions.
+
+```tsx
+<Button variant="ghost">Dismiss</Button>
+```
+
+### Link
+
+Styled as a link with underline on hover.
+
+```tsx
+<Button variant="link">Read Documentation</Button>
+```
+
+## Sizes
+
+Buttons come in 8 different sizes including icon-specific variants:
+
+```tsx
+<Button size="xs">Extra Small</Button>
+<Button size="sm">Small</Button>
+<Button size="default">Default</Button>
+<Button size="lg">Large</Button>
+
+{/* Icon buttons */}
+<Button size="icon-xs"><XIcon /></Button>
+<Button size="icon-sm"><XIcon /></Button>
+<Button size="icon"><XIcon /></Button>
+<Button size="icon-lg"><XIcon /></Button>
+```
+
+### Size Specifications
+
+| Size | Height | Padding | Use Case |
+|------|--------|---------|----------|
+| `xs` | 24px (h-6) | px-2 | Compact interfaces |
+| `sm` | 32px (h-8) | px-3 | Dense layouts |
+| `default` | 36px (h-9) | px-4 | Standard buttons |
+| `lg` | 40px (h-10) | px-6 | Prominent actions |
+| `icon-xs` | 24px × 24px | - | Small icon buttons |
+| `icon-sm` | 32px × 32px | - | Medium icon buttons |
+| `icon` | 36px × 36px | - | Standard icon buttons |
+| `icon-lg` | 40px × 40px | - | Large icon buttons |
+
+## States
+
+### Disabled
+
+```tsx
+<Button disabled>Disabled Button</Button>
+```
+
+### Loading
+
+```tsx
+import { Button } from "@/components/ui/button"
+import { Loader2Icon } from "lucide-react"
+
+export default function Example() {
+  return (
+    <Button disabled>
+      <Loader2Icon className="animate-spin" />
+      Loading...
+    </Button>
+  )
+}
+```
+
+## As Child (Composition)
+
+Use `asChild` to compose the button with other elements like Next.js Link:
+
+```tsx
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+
+export default function Example() {
+  return (
+    <Button asChild>
+      <Link href="/dashboard">Go to Dashboard</Link>
+    </Button>
+  )
+}
+```
+
+This uses Radix UI's Slot component to merge props and avoid wrapper elements.
+
+## Props
+
+```tsx
+type ButtonProps = React.ComponentProps<"button"> & {
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
+  size?: "default" | "sm" | "lg" | "xs" | "icon" | "icon-xs" | "icon-sm" | "icon-lg"
+  asChild?: boolean
+}
+```
+
+### Parameters
+
+<ParamField path="variant" type="string" default="default">
+  Visual style variant:
+  - `default` - Primary button style
+  - `destructive` - For dangerous actions
+  - `outline` - Outlined button
+  - `secondary` - Secondary actions
+  - `ghost` - Minimal styling
+  - `link` - Link-styled button
+</ParamField>
+
+<ParamField path="size" type="string" default="default">
+  Button size:
+  - `xs` - Extra small (24px)
+  - `sm` - Small (32px)
+  - `default` - Default (36px)
+  - `lg` - Large (40px)
+  - `icon-xs` - Icon only extra small
+  - `icon-sm` - Icon only small
+  - `icon` - Icon only default
+  - `icon-lg` - Icon only large
+</ParamField>
+
+<ParamField path="asChild" type="boolean" default="false">
+  When true, renders the button as a Slot to compose with child elements
+</ParamField>
+
+## Examples
+
+### Action Buttons
+
+```tsx
+import { Button } from "@/components/ui/button"
+import { TrashIcon, DownloadIcon } from "lucide-react"
+
+export default function ActionButtons() {
+  return (
+    <div className="flex gap-2">
+      <Button variant="destructive">
+        <TrashIcon />
+        Delete
+      </Button>
+      <Button variant="outline">
+        <DownloadIcon />
+        Download
+      </Button>
+    </div>
+  )
+}
+```
+
+### Form Submit
+
+```tsx
+import { Button } from "@/components/ui/button"
+
+export default function FormExample() {
+  return (
+    <form>
+      {/* form fields */}
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" type="button">Cancel</Button>
+        <Button type="submit">Submit</Button>
+      </div>
+    </form>
+  )
+}
+```
+
+### Icon Buttons
+
+```tsx
+import { Button } from "@/components/ui/button"
+import { Settings, Bell, User } from "lucide-react"
+
+export default function IconButtons() {
+  return (
+    <div className="flex gap-2">
+      <Button size="icon" variant="ghost">
+        <Settings />
+      </Button>
+      <Button size="icon" variant="ghost">
+        <Bell />
+      </Button>
+      <Button size="icon" variant="ghost">
+        <User />
+      </Button>
+    </div>
+  )
+}
+```
+
+## Accessibility Features
+
+- **Focus visible**: Custom focus ring styling with `focus-visible:ring`
+- **Disabled state**: Proper `disabled` attribute with visual feedback
+- **ARIA invalid**: Support for `aria-invalid` attribute with error styling
+- **Keyboard navigation**: Full keyboard support
+- **Screen reader**: Proper button semantics
+
+## Customization
+
+### Custom Styling
+
+Add custom classes via the `className` prop:
+
+```tsx
+<Button className="w-full">Full Width Button</Button>
+```
+
+### Custom Variant
+
+Extend the button variants in your component:
+
+```tsx
+import { Button, buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+
+function CustomButton() {
+  return (
+    <Button className={cn(buttonVariants({ variant: "outline" }), "border-blue-500")}>
+      Custom
+    </Button>
+  )
+}
+```
+
+## Source Code
+
+View the source: `components/ui/button.tsx:1`
+
+<Accordion title="View Full Source">
+```tsx
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { Slot } from "radix-ui";
+import { cn } from "@/lib/utils";
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-white hover:bg-destructive/90",
+        outline: "border bg-background shadow-xs hover:bg-accent",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-9 px-4 py-2",
+        xs: "h-6 gap-1 rounded-md px-2 text-xs",
+        sm: "h-8 rounded-md gap-1.5 px-3",
+        lg: "h-10 rounded-md px-6",
+        icon: "size-9",
+        "icon-xs": "size-6 rounded-md",
+        "icon-sm": "size-8",
+        "icon-lg": "size-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+);
+
+function Button({
+  className,
+  variant = "default",
+  size = "default",
+  asChild = false,
+  ...props
+}: React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+  }) {
+  const Comp = asChild ? Slot.Root : "button";
+  return (
+    <Comp
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  );
+}
+
+export { Button, buttonVariants };
+```
+</Accordion>

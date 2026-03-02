@@ -1,0 +1,361 @@
+---
+title: "UI Components"
+description: "56+ pre-built components from shadcn/ui with Tailwind CSS"
+---
+
+Tendon includes a comprehensive set of UI components from [shadcn/ui](https://ui.shadcn.com), providing 56+ production-ready components built with Radix UI and Tailwind CSS.
+
+## Overview
+
+The UI system includes:
+
+- **56+ Components**: From basic buttons to complex data tables
+- **shadcn/ui**: Copy-paste component library (components are in your codebase)
+- **Radix UI**: Unstyled, accessible component primitives
+- **Tailwind CSS**: Utility-first CSS framework with custom design tokens
+- **New York Style**: Modern, clean design system
+- **Dark Mode**: Built-in dark mode support
+
+## Configuration
+
+The shadcn/ui setup is configured in `components.json`:
+
+```json
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "app/globals.css",
+    "baseColor": "stone",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  }
+}
+```
+
+Key configuration details:
+
+- **Style**: Uses the "new-york" design variant (clean, modern aesthetic)
+- **RSC**: React Server Components enabled
+- **Base Color**: Stone color palette for neutral tones
+- **CSS Variables**: Uses CSS variables for theming
+- **Icons**: Lucide React for icons
+
+## Available Components
+
+Tendon includes 56 pre-installed components in `components/ui/`:
+
+### Layout & Structure
+
+- **accordion** - Expandable/collapsible content sections
+- **aspect-ratio** - Maintain consistent aspect ratios
+- **card** - Content container with header, content, and footer
+- **collapsible** - Show/hide content
+- **resizable** - Resizable panel layouts
+- **separator** - Visual divider between content
+- **sidebar** - Navigation sidebar with collapsible sections
+- **tabs** - Tabbed interface for organizing content
+
+### Forms & Inputs
+
+- **button** - Primary action buttons
+- **button-group** - Group multiple buttons together
+- **checkbox** - Toggle checkbox input
+- **combobox** - Searchable select dropdown
+- **form** - Form wrapper with validation
+- **field** - Form field wrapper
+- **input** - Text input field
+- **input-group** - Grouped input with prefix/suffix
+- **input-otp** - One-time password input
+- **label** - Form field labels
+- **native-select** - Native HTML select dropdown
+- **radio-group** - Radio button group
+- **select** - Custom select dropdown
+- **slider** - Range slider input
+- **switch** - Toggle switch
+- **textarea** - Multi-line text input
+- **toggle** - Toggle button
+- **toggle-group** - Group of toggle buttons
+
+### Navigation
+
+- **breadcrumb** - Breadcrumb navigation
+- **command** - Command palette (CMD+K)
+- **context-menu** - Right-click context menu
+- **dropdown-menu** - Dropdown menu
+- **menubar** - Application menu bar
+- **navigation-menu** - Primary navigation component
+- **pagination** - Page navigation controls
+
+### Feedback & Overlays
+
+- **alert** - Alert messages and notifications
+- **alert-dialog** - Modal alert dialog
+- **dialog** - Modal dialog
+- **drawer** - Bottom drawer / side sheet
+- **hover-card** - Popover on hover
+- **popover** - Floating popover content
+- **progress** - Progress bar
+- **sheet** - Side sheet / drawer
+- **skeleton** - Loading skeleton
+- **sonner** - Toast notifications
+- **spinner** - Loading spinner
+- **tooltip** - Contextual tooltips
+
+### Data Display
+
+- **avatar** - User avatar image
+- **badge** - Status badges and labels
+- **calendar** - Date picker calendar
+- **chart** - Chart components (using Recharts)
+- **empty** - Empty state placeholder
+- **kbd** - Keyboard shortcut display
+- **scroll-area** - Custom scrollable area
+- **table** - Data table
+
+### Utilities
+
+- **direction** - RTL/LTR direction control
+- **item** - Generic list item component
+
+## Component Usage
+
+### Basic Example
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+export default function MyPage() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Welcome</CardTitle>
+        <CardDescription>Get started with Tendon</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Button>Click me</Button>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+### Form Example
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export default function LoginForm() {
+  return (
+    <form>
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" type="email" placeholder="you@example.com" />
+        </div>
+        <div>
+          <Label htmlFor="password">Password</Label>
+          <Input id="password" type="password" />
+        </div>
+        <Button type="submit">Sign In</Button>
+      </div>
+    </form>
+  );
+}
+```
+
+### Dialog Example
+
+```tsx
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+export default function MyDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open Dialog</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <Button>Confirm</Button>
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+## Tailwind CSS Configuration
+
+Tendon uses Tailwind CSS v4 with a custom design system configured in `app/globals.css`:
+
+```css
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --radius-lg: var(--radius);
+  /* ... more design tokens */
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.147 0.004 49.25);
+  /* ... more CSS variables */
+}
+
+.dark {
+  --background: oklch(0.147 0.004 49.25);
+  --foreground: oklch(0.985 0.001 106.423);
+  /* ... dark mode overrides */
+}
+```
+
+### Design Tokens
+
+The design system includes:
+
+- **Colors**: `background`, `foreground`, `primary`, `secondary`, `muted`, `accent`, `destructive`
+- **Border Radius**: `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`
+- **Chart Colors**: `chart-1` through `chart-5`
+- **Sidebar Colors**: Dedicated sidebar theme tokens
+
+<Tip>
+  All colors use OKLCH color space for better perceptual uniformity and color manipulation.
+</Tip>
+
+## Dark Mode
+
+Dark mode is built-in and toggleable. The theme uses CSS classes:
+
+```tsx
+// Add dark mode toggle
+import { useTheme } from "next-themes";
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+
+  return (
+    <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+      Toggle Theme
+    </button>
+  );
+}
+```
+
+## Adding New Components
+
+To add more shadcn/ui components:
+
+```bash
+pnpm dlx shadcn@latest add [component-name]
+```
+
+For example:
+
+```bash
+pnpm dlx shadcn@latest add toast
+pnpm dlx shadcn@latest add data-table
+pnpm dlx shadcn@latest add form
+```
+
+<Note>
+  Components are copied directly into your `components/ui/` directory, so you have full control to customize them.
+</Note>
+
+## Styling Components
+
+### Using Utility Classes
+
+```tsx
+<Button className="bg-blue-500 hover:bg-blue-600">Custom Button</Button>
+```
+
+### Using Design Tokens
+
+```tsx
+<div className="bg-background text-foreground border border-border rounded-lg">
+  Themed content
+</div>
+```
+
+### Component Variants
+
+Many components support variants:
+
+```tsx
+<Button variant="default">Default</Button>
+<Button variant="destructive">Delete</Button>
+<Button variant="outline">Cancel</Button>
+<Button variant="ghost">Ghost</Button>
+<Button variant="link">Link</Button>
+
+<Button size="sm">Small</Button>
+<Button size="default">Default</Button>
+<Button size="lg">Large</Button>
+<Button size="icon">🔍</Button>
+```
+
+## Accessibility
+
+All components are built on Radix UI primitives, which provide:
+
+- **Keyboard Navigation**: Full keyboard support
+- **Screen Reader Support**: ARIA attributes and labels
+- **Focus Management**: Proper focus trapping and restoration
+- **WCAG Compliance**: Meets accessibility standards
+
+## Icons
+
+Tendon uses [Lucide React](https://lucide.dev) for icons:
+
+```tsx
+import { Search, User, Settings } from "lucide-react";
+
+<Button>
+  <Search className="mr-2 h-4 w-4" />
+  Search
+</Button>
+```
+
+<Tip>
+  Browse all available icons at [lucide.dev](https://lucide.dev/icons/)
+</Tip>
+
+## Next Steps
+
+- [shadcn/ui Documentation](https://ui.shadcn.com) - Component API reference
+- [Radix UI Primitives](https://www.radix-ui.com/primitives) - Headless component primitives
+- [Tailwind CSS v4](https://tailwindcss.com) - Utility-first CSS framework
+- Customize components in `components/ui/`
+- Create your own composite components

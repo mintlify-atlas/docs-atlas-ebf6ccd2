@@ -1,0 +1,363 @@
+---
+title: 'Tech Stack'
+description: 'Comprehensive overview of all technologies and packages used in the Tendon template'
+icon: 'layer-group'
+---
+
+## Overview
+
+Tendon is built with modern, production-ready technologies that prioritize developer experience, performance, and type safety. This page provides a complete reference of all dependencies and the reasoning behind each choice.
+
+## Core Framework
+
+<CardGroup cols={2}>
+  <Card title="Next.js" icon="react" href="https://nextjs.org">
+    **Version:** 16.1.6
+    
+    React framework with server-side rendering, static generation, and file-based routing.
+    
+    **Why we chose it:**
+    - Industry-standard React framework
+    - Excellent performance with React Server Components
+    - Built-in routing and API routes
+    - Optimal SEO and loading performance
+  </Card>
+  
+  <Card title="React" icon="atom" href="https://react.dev">
+    **Version:** 19.2.4
+    
+    JavaScript library for building user interfaces with components.
+    
+    **Why we chose it:**
+    - Most popular UI library
+    - Massive ecosystem and community
+    - Server Components support
+    - Excellent TypeScript integration
+  </Card>
+  
+  <Card title="TypeScript" icon="code" href="https://www.typescriptlang.org">
+    **Version:** 5.x
+    
+    Typed superset of JavaScript that compiles to plain JavaScript.
+    
+    **Why we chose it:**
+    - Type safety prevents runtime errors
+    - Superior developer experience with autocomplete
+    - Better refactoring and maintainability
+    - Industry standard for serious projects
+  </Card>
+  
+  <Card title="Vinext" icon="bolt" href="https://vinext.org">
+    **Version:** 0.0.14
+    
+    Vite-powered Next.js alternative for faster development and builds.
+    
+    **Why we chose it:**
+    - Extremely fast HMR with Vite
+    - Better development experience
+    - Compatible with Next.js ecosystem
+    - Faster builds than traditional Next.js
+  </Card>
+</CardGroup>
+
+## Authentication
+
+<Card title="Better Auth" icon="shield-halved" href="https://better-auth.com">
+  **Version:** 1.4.20
+  
+  Modern, type-safe authentication library for Next.js.
+  
+  **Why we chose it:**
+  - Built specifically for Next.js and React Server Components
+  - Type-safe with excellent TypeScript support
+  - Easy to customize and extend
+  - Supports multiple auth strategies (email, OAuth, etc.)
+  - No vendor lock-in - you own your database
+  
+  **Features included:**
+  - Email/password authentication
+  - Session management
+  - User management
+  - Secure cookie handling
+</Card>
+
+## Database
+
+<CardGroup cols={2}>
+  <Card title="Drizzle ORM" icon="database" href="https://orm.drizzle.team">
+    **Version:** 0.45.1
+    
+    TypeScript ORM with SQL-like syntax and excellent type inference.
+    
+    **Why we chose it:**
+    - Full type safety with TypeScript
+    - SQL-like syntax (easy to learn)
+    - Lightweight and performant
+    - Great migration system
+    - No magic - you control your queries
+    
+    **Dev Dependency:** `drizzle-kit` (0.31.9) for migrations
+  </Card>
+  
+  <Card title="Turso / LibSQL" icon="server" href="https://turso.tech">
+    **Version:** @libsql/client 0.17.0
+    
+    Edge-hosted SQLite-compatible database with global replication.
+    
+    **Why we chose it:**
+    - SQLite compatibility (easy to develop locally)
+    - Edge deployment for low latency
+    - Generous free tier
+    - Branching and point-in-time recovery
+    - Works with Drizzle ORM perfectly
+  </Card>
+</CardGroup>
+
+## UI Components & Styling
+
+<CardGroup cols={2}>
+  <Card title="Tailwind CSS" icon="paintbrush" href="https://tailwindcss.com">
+    **Version:** 4.x
+    
+    Utility-first CSS framework for rapid UI development.
+    
+    **Why we chose it:**
+    - Rapid development with utility classes
+    - Consistent design system
+    - Tiny production bundle (purged CSS)
+    - Excellent documentation
+    - Industry standard
+    
+    **Related packages:**
+    - `@tailwindcss/postcss` (4.x) - PostCSS integration
+    - `tw-animate-css` (1.4.0) - Animation utilities
+  </Card>
+  
+  <Card title="shadcn/ui" icon="palette" href="https://ui.shadcn.com">
+    **Version:** 3.8.5 (dev dependency)
+    
+    Copy-paste component library built on Radix UI and Tailwind.
+    
+    **Why we chose it:**
+    - Own your components (not a dependency)
+    - Beautiful, accessible components
+    - Built on Radix UI primitives
+    - Highly customizable
+    - Active community
+  </Card>
+  
+  <Card title="Radix UI" icon="circle-nodes" href="https://www.radix-ui.com">
+    **Version:** 1.4.3
+    
+    Unstyled, accessible component primitives.
+    
+    **Why we chose it:**
+    - Full accessibility (ARIA) support
+    - Keyboard navigation built-in
+    - Unstyled (style however you want)
+    - Used by shadcn/ui
+    
+    **Related:** `@base-ui/react` (1.2.0) - Additional primitives
+  </Card>
+  
+  <Card title="Lucide Icons" icon="icons" href="https://lucide.dev">
+    **Version:** 0.575.0
+    
+    Beautiful, consistent icon library with React components.
+    
+    **Why we chose it:**
+    - 1000+ icons
+    - Tree-shakeable (only bundle what you use)
+    - Consistent design
+    - TypeScript support
+    - Active maintenance
+  </Card>
+</CardGroup>
+
+## UI Utilities
+
+### Layout & Interaction
+
+| Package | Version | Purpose |
+|---------|---------|----------|
+| `class-variance-authority` | 0.7.1 | Type-safe component variants |
+| `clsx` | 2.1.1 | Conditional CSS classes |
+| `tailwind-merge` | 3.5.0 | Merge Tailwind classes intelligently |
+| `cmdk` | 1.1.1 | Command palette component (⌘K) |
+| `motion` | 12.34.3 | Animation library (formerly Framer Motion) |
+| `next-themes` | 0.4.6 | Dark mode support |
+| `react-resizable-panels` | 4.6.5 | Resizable panel layouts |
+| `vaul` | 1.1.2 | Drawer/bottom sheet component |
+| `embla-carousel-react` | 8.6.0 | Carousel/slider component |
+
+### Forms & Validation
+
+| Package | Version | Purpose |
+|---------|---------|----------|
+| `react-hook-form` | 7.71.2 | Performant form library |
+| `@hookform/resolvers` | 5.2.2 | Validation resolvers for react-hook-form |
+| `zod` | 4.3.6 | TypeScript-first schema validation |
+| `input-otp` | 1.4.2 | OTP/PIN input component |
+
+### Data & Dates
+
+| Package | Version | Purpose |
+|---------|---------|----------|
+| `date-fns` | 4.1.0 | Modern date utility library |
+| `react-day-picker` | 9.13.2 | Date picker component |
+| `recharts` | 2.15.4 | Chart library for data visualization |
+
+### Feedback
+
+| Package | Version | Purpose |
+|---------|---------|----------|
+| `sonner` | 2.0.7 | Toast notifications |
+
+## Build Tools & Development
+
+<CardGroup cols={2}>
+  <Card title="Vite" icon="zap" href="https://vitejs.dev">
+    **Version:** 7.3.1
+    
+    Next-generation frontend build tool.
+    
+    **Why we chose it:**
+    - Lightning-fast HMR
+    - Native ESM support
+    - Optimized production builds
+    - Used by Vinext
+    
+    **Related:** `@vitejs/plugin-rsc` (0.5.21) - React Server Components support
+  </Card>
+  
+  <Card title="ESLint" icon="triangle-exclamation" href="https://eslint.org">
+    **Version:** 9.x
+    
+    Linting tool for identifying code quality issues.
+    
+    **Why we chose it:**
+    - Industry standard linter
+    - Catches bugs before runtime
+    - Enforces code quality
+    
+    **Related:** `eslint-config-next` (16.1.6) - Next.js ESLint config
+  </Card>
+  
+  <Card title="oxfmt" icon="wand-magic-sparkles" href="https://github.com/oxc-project/oxc">
+    **Version:** 0.35.0
+    
+    Fast Rust-based code formatter.
+    
+    **Why we chose it:**
+    - Extremely fast (written in Rust)
+    - Consistent code formatting
+    - Drop-in Prettier replacement
+    - Better performance
+  </Card>
+</CardGroup>
+
+## Development Dependencies
+
+### TypeScript Type Definitions
+
+| Package | Version | Purpose |
+|---------|---------|----------|
+| `@types/node` | 20.x | Node.js type definitions |
+| `@types/react` | 19.x | React type definitions |
+| `@types/react-dom` | 19.x | ReactDOM type definitions |
+
+### React Server Components
+
+| Package | Version | Purpose |
+|---------|---------|----------|
+| `react-server-dom-webpack` | 19.2.4 | RSC webpack integration |
+| `@vitejs/plugin-rsc` | 0.5.21 | RSC Vite plugin |
+
+## Technology Decisions
+
+### Why These Choices?
+
+<AccordionGroup>
+  <Accordion title="Modern Stack" icon="star">
+    Every technology is actively maintained, has strong TypeScript support, and represents current best practices in React development.
+  </Accordion>
+  
+  <Accordion title="Performance First" icon="rocket">
+    From Vite's instant HMR to Drizzle's lightweight queries and edge-deployed Turso database, every choice optimizes for speed.
+  </Accordion>
+  
+  <Accordion title="Type Safety" icon="shield">
+    TypeScript throughout, Zod for runtime validation, Drizzle for type-safe queries, and Better Auth for type-safe authentication.
+  </Accordion>
+  
+  <Accordion title="Developer Experience" icon="heart">
+    Fast builds with Vite, excellent TypeScript autocomplete, hot reload, beautiful UI components, and comprehensive CLI tools.
+  </Accordion>
+  
+  <Accordion title="No Vendor Lock-in" icon="unlock">
+    You own your auth database (Better Auth), your UI components (shadcn), and your queries (Drizzle). Easy to migrate away if needed.
+  </Accordion>
+  
+  <Accordion title="Production Ready" icon="check">
+    All packages are battle-tested, have large communities, and are used by major companies in production.
+  </Accordion>
+</AccordionGroup>
+
+## Package Categories Summary
+
+| Category | Count | Examples |
+|----------|-------|----------|
+| **Core Framework** | 4 | Next.js, React, TypeScript, Vinext |
+| **Authentication** | 1 | Better Auth |
+| **Database** | 2 | Drizzle ORM, LibSQL Client |
+| **Styling** | 3 | Tailwind CSS, PostCSS, Animations |
+| **UI Components** | 3 | Radix UI, Base UI, shadcn |
+| **UI Utilities** | 10 | Forms, dates, icons, animations |
+| **Build Tools** | 6 | Vite, ESLint, oxfmt, TypeScript |
+| **Type Definitions** | 3 | Node, React, React DOM |
+| **Total Dependencies** | 26 | Production dependencies |
+| **Total Dev Dependencies** | 11 | Development dependencies |
+
+## Version Information
+
+This documentation is based on the following package versions:
+
+```json
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "type": "module"
+}
+```
+
+<Info>
+  All version numbers are current as of the latest template release. Check the [package.json](https://github.com/yourusername/tendon) for the most up-to-date versions.
+</Info>
+
+## Learning Resources
+
+<CardGroup cols={2}>
+  <Card title="Next.js Docs" icon="book" href="https://nextjs.org/docs">
+    Official Next.js documentation
+  </Card>
+  <Card title="Drizzle ORM Docs" icon="book" href="https://orm.drizzle.team/docs/overview">
+    Learn database queries and migrations
+  </Card>
+  <Card title="Better Auth Docs" icon="book" href="https://better-auth.com/docs">
+    Authentication setup and configuration
+  </Card>
+  <Card title="shadcn/ui Docs" icon="book" href="https://ui.shadcn.com">
+    Browse and copy UI components
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="npm Scripts" icon="terminal" href="/reference/scripts">
+    Learn all available commands
+  </Card>
+  <Card title="Environment Variables" icon="key" href="/reference/environment-variables">
+    Configure your environment
+  </Card>
+</CardGroup>

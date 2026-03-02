@@ -1,0 +1,484 @@
+---
+title: Form
+description: Accessible form components with validation using react-hook-form and Zod
+icon: 'input-text'
+---
+
+The Form component provides a comprehensive solution for building forms with validation, error handling, and accessibility. Built on top of `react-hook-form` with Zod schema validation.
+
+## Installation
+
+The Form component is included by default. To add it to a new project:
+
+```bash
+npx shadcn@latest add form
+```
+
+You'll also need these dependencies:
+
+```bash
+npm install react-hook-form @hookform/resolvers zod
+```
+
+## Import
+
+```tsx
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+```
+
+## Basic Usage
+
+```tsx
+"use client"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+
+const formSchema = z.object({
+  username: z.string().min(2, {
+    message: "Username must be at least 2 characters.",
+  }),
+})
+
+export default function ProfileForm() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: "",
+    },
+  })
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter username" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Submit</Button>
+      </form>
+    </Form>
+  )
+}
+```
+
+## Components
+
+### Form
+
+Wrapper component that provides form context. It's actually an alias for `react-hook-form`'s `FormProvider`.
+
+```tsx
+const form = useForm()
+
+return (
+  <Form {...form}>
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      {/* form fields */}
+    </form>
+  </Form>
+)
+```
+
+### FormField
+
+Wraps `react-hook-form`'s `Controller` component to provide field-level control.
+
+```tsx
+<FormField
+  control={form.control}
+  name="fieldName"
+  render={({ field }) => (
+    <FormItem>
+      {/* form UI */}
+    </FormItem>
+  )}
+/>
+```
+
+**Props:**
+- `control` - Form control from `useForm`
+- `name` - Field name (typed based on your schema)
+- `render` - Render function receiving field props
+
+### FormItem
+
+Container for a complete form field including label, input, description, and error message.
+
+```tsx
+<FormItem>
+  <FormLabel>Email</FormLabel>
+  <FormControl>
+    <Input type="email" {...field} />
+  </FormControl>
+  <FormDescription>Enter your email address</FormDescription>
+  <FormMessage />
+</FormItem>
+```
+
+**Features:**
+- Automatic ID generation
+- Grid layout with consistent spacing
+- Context for child components
+
+### FormLabel
+
+Accessible label component with error state styling.
+
+```tsx
+<FormLabel>Username</FormLabel>
+```
+
+**Features:**
+- Automatically linked to form input via `htmlFor`
+- Red text color when field has an error
+- Inherits from base `Label` component
+
+### FormControl
+
+Wrapper for input components using Radix UI's Slot.
+
+```tsx
+<FormControl>
+  <Input {...field} />
+</FormControl>
+```
+
+**Features:**
+- Sets `id`, `aria-describedby`, and `aria-invalid` attributes
+- Properly links to description and error messages
+- Works with any input component
+
+### FormDescription
+
+Helper text for the form field.
+
+```tsx
+<FormDescription>
+  This is your public display name.
+</FormDescription>
+```
+
+**Styling:**
+- Muted text color
+- Small text size
+- Linked via `aria-describedby`
+
+### FormMessage
+
+Displays validation error messages.
+
+```tsx
+<FormMessage />
+```
+
+**Features:**
+- Automatically displays error from validation
+- Can override with custom children
+- Red text color (destructive)
+- Only renders when there's an error or custom content
+
+## Complete Form Example
+
+```tsx
+"use client"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+const formSchema = z.object({
+  username: z.string().min(2).max(50),
+  email: z.string().email(),
+  bio: z.string().max(160).optional(),
+  role: z.enum(["user", "admin", "moderator"]),
+})
+
+export default function CompleteForm() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: "",
+      email: "",
+      bio: "",
+      role: "user",
+    },
+  })
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder="johndoe" {...field} />
+              </FormControl>
+              <FormDescription>
+                This is your public display name.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="[email protected]" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="bio"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Bio</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Tell us about yourself"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                Brief description for your profile (max 160 characters).
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="role"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Role</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="moderator">Moderator</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit">Submit</Button>
+      </form>
+    </Form>
+  )
+}
+```
+
+## Validation Patterns
+
+### Required Fields
+
+```tsx
+const schema = z.object({
+  name: z.string().min(1, "Name is required"),
+})
+```
+
+### Email Validation
+
+```tsx
+const schema = z.object({
+  email: z.string().email("Invalid email address"),
+})
+```
+
+### Length Constraints
+
+```tsx
+const schema = z.object({
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .max(100, "Password must be less than 100 characters"),
+})
+```
+
+### Pattern Matching
+
+```tsx
+const schema = z.object({
+  username: z.string()
+    .regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, and underscores"),
+})
+```
+
+### Optional Fields
+
+```tsx
+const schema = z.object({
+  bio: z.string().optional(),
+  website: z.string().url().optional(),
+})
+```
+
+## Advanced Patterns
+
+### Conditional Validation
+
+```tsx
+const schema = z.object({
+  sendEmail: z.boolean(),
+  email: z.string().email().optional(),
+}).refine(
+  (data) => {
+    if (data.sendEmail) {
+      return !!data.email
+    }
+    return true
+  },
+  {
+    message: "Email is required when send email is enabled",
+    path: ["email"],
+  }
+)
+```
+
+### Custom Error Messages
+
+```tsx
+<FormField
+  control={form.control}
+  name="username"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Username</FormLabel>
+      <FormControl>
+        <Input {...field} />
+      </FormControl>
+      <FormMessage>
+        {form.formState.errors.username?.message}
+      </FormMessage>
+    </FormItem>
+  )}
+/>
+```
+
+### Form-level Errors
+
+```tsx
+function onSubmit(values: z.infer<typeof formSchema>) {
+  try {
+    // Submit logic
+  } catch (error) {
+    form.setError("root", {
+      message: "Something went wrong. Please try again."
+    })
+  }
+}
+
+// Display root error
+{form.formState.errors.root && (
+  <div className="text-sm text-destructive">
+    {form.formState.errors.root.message}
+  </div>
+)}
+```
+
+## Accessibility Features
+
+- **ARIA attributes**: Proper `aria-describedby` and `aria-invalid` attributes
+- **Label association**: Labels automatically linked to inputs
+- **Error announcement**: Error messages linked for screen readers
+- **Focus management**: Proper focus states with visual indicators
+- **Keyboard navigation**: Full keyboard support
+
+## Integration with Other Components
+
+The Form components work seamlessly with all form inputs:
+
+- Input
+- Textarea
+- Select
+- Checkbox
+- Radio Group
+- Switch
+- Combobox
+- Date Picker
+
+Just wrap them in `FormControl` and spread the `field` props.
+
+## Source Code
+
+View the source: `components/ui/form.tsx:1`

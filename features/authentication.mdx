@@ -1,0 +1,269 @@
+---
+title: "Authentication"
+description: "Secure authentication with Better Auth, email/password support, and session management"
+---
+
+Tendon comes with [Better Auth](https://better-auth.com) fully integrated and configured. Better Auth is a modern authentication library for Next.js that provides a simple, secure, and flexible authentication solution.
+
+## Overview
+
+The authentication system includes:
+
+- Email and password authentication
+- Session management with token-based authentication
+- Drizzle ORM integration for database storage
+- Next.js cookie support
+- Type-safe client and server methods
+
+## Server Configuration
+
+The main authentication configuration is located in `lib/auth.ts`:
+
+```typescript
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { betterAuth } from "better-auth";
+import { nextCookies } from "better-auth/next-js";
+import { db } from "@/lib/db";
+import * as schema from "@/lib/db/schema";
+
+const baseURL = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
+const secret =
+  process.env.BETTER_AUTH_SECRET ??
+  (process.env.NODE_ENV === "production" ? undefined : "dev-only-secret-change-me");
+
+if (!secret) {
+  throw new Error("BETTER_AUTH_SECRET must be set in production");
+}
+
+export const auth = betterAuth({
+  baseURL,
+  secret,
+  trustedOrigins: [baseURL],
+  emailAndPassword: {
+    enabled: true,
+  },
+  database: drizzleAdapter(db, {
+    provider: "sqlite",
+    schema,
+  }),
+  plugins: [nextCookies()],
+});
+```
+
+<Warning>
+  In production, you **must** set the `BETTER_AUTH_SECRET` environment variable. The default development secret is not secure for production use.
+</Warning>
+
+## Environment Variables
+
+Add these to your `.env` file:
+
+```bash
+# Required in production
+BETTER_AUTH_SECRET=your-secret-key-here
+
+# Optional: defaults to http://localhost:3000 in development
+BETTER_AUTH_URL=https://yourdomain.com
+```
+
+## API Route
+
+Better Auth requires an API route handler at `app/api/auth/[...all]/route.ts`:
+
+```typescript
+import { toNextJsHandler } from "better-auth/next-js";
+import { auth } from "@/lib/auth";
+
+export const runtime = "nodejs";
+
+export const { GET, POST } = toNextJsHandler(auth);
+```
+
+This creates all necessary authentication endpoints:
+
+- `/api/auth/sign-in` - Sign in endpoint
+- `/api/auth/sign-up` - Sign up endpoint
+- `/api/auth/sign-out` - Sign out endpoint
+- `/api/auth/session` - Session verification
+
+## Client Usage
+
+The client is configured in `lib/auth-client.ts`:
+
+```typescript
+import { createAuthClient } from "better-auth/react";
+
+export const authClient = createAuthClient();
+```
+
+### Available Methods
+
+Better Auth provides these client-side methods:
+
+#### Sign Up
+
+```typescript
+import { authClient } from "@/lib/auth-client";
+
+const handleSignUp = async () => {
+  await authClient.signUp.email({
+    email: "user@example.com",
+    password: "securepassword123",
+    name: "John Doe",
+  });
+};
+```
+
+#### Sign In
+
+```typescript
+import { authClient } from "@/lib/auth-client";
+
+const handleSignIn = async () => {
+  await authClient.signIn.email({
+    email: "user@example.com",
+    password: "securepassword123",
+  });
+};
+```
+
+#### Sign Out
+
+```typescript
+import { authClient } from "@/lib/auth-client";
+
+const handleSignOut = async () => {
+  await authClient.signOut();
+};
+```
+
+#### useSession Hook
+
+```typescript
+import { authClient } from "@/lib/auth-client";
+
+function ProfilePage() {
+  const { data: session, isPending } = authClient.useSession();
+
+  if (isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (!session) {
+    return <div>Not authenticated</div>;
+  }
+
+  return (
+    <div>
+      <h1>Welcome, {session.user.name}</h1>
+      <p>Email: {session.user.email}</p>
+    </div>
+  );
+}
+```
+
+## Database Schema
+
+Better Auth uses the following tables (generated in `lib/db/schema.ts`):
+
+### User Table
+
+```typescript
+export const user = sqliteTable("user", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: integer("email_verified", { mode: "boolean" }).default(false).notNull(),
+  image: text("image"),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" }),
+});
+```
+
+### Session Table
+
+```typescript
+export const session = sqliteTable("session", {
+  id: text("id").primaryKey(),
+  expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+  token: text("token").notNull().unique(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+});
+```
+
+### Account Table
+
+Stores authentication provider credentials (including email/password):
+
+```typescript
+export const account = sqliteTable("account", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  password: text("password"), // Hashed password for email/password auth
+  // ... other OAuth fields
+});
+```
+
+## Session Management
+
+Sessions are managed automatically with the following features:
+
+- **Token-based authentication**: Sessions use secure tokens stored in cookies
+- **Expiration tracking**: Each session has an `expiresAt` timestamp
+- **IP and User Agent tracking**: Sessions store IP address and user agent for security
+- **Cascade deletion**: Sessions are automatically deleted when a user is deleted
+
+<Tip>
+  Sessions are stored in cookies using the `nextCookies()` plugin, which handles all cookie management automatically for Next.js applications.
+</Tip>
+
+## Server-Side Authentication
+
+You can verify authentication on the server side:
+
+```typescript
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+
+export default async function ProtectedPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/sign-in");
+  }
+
+  return <div>Protected content for {session.user.name}</div>;
+}
+```
+
+## Generating Auth Schema
+
+To generate or update the authentication schema:
+
+```bash
+pnpm auth:generate
+```
+
+This runs the Better Auth CLI to generate the necessary database schema in `lib/db/schema.ts`.
+
+<Note>
+  The `db:setup` command runs `auth:generate`, `db:generate`, and `db:migrate` in sequence to fully set up your database with authentication tables.
+</Note>
+
+## Next Steps
+
+- [Database](/features/database) - Learn about the database layer
+- [Better Auth Documentation](https://better-auth.com) - Official Better Auth docs
+- Add OAuth providers (Google, GitHub, etc.)
+- Implement email verification
+- Set up two-factor authentication

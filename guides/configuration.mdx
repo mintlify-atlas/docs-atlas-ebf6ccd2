@@ -1,0 +1,229 @@
+---
+title: Configuration
+description: Configure environment variables, Next.js settings, and database options for the Tendon template
+---
+
+## Environment Variables
+
+The Tendon template uses environment variables to configure authentication, database connections, and application settings. Copy `.env.example` to `.env.local` to get started:
+
+```bash
+cp .env.example .env.local
+```
+
+### Authentication Configuration
+
+<ParamField path="BETTER_AUTH_URL" type="string" required>
+  The base URL of your application. Used by Better Auth for session cookies and OAuth redirects.
+  
+  **Development:** `http://localhost:3000`
+  
+  **Production:** `https://your-domain.com`
+  
+  <Warning>
+    Keep the URL in sync with your browser URL for reliable cookie/session behavior. Both should use the same host (e.g., both `localhost`).
+  </Warning>
+</ParamField>
+
+<ParamField path="BETTER_AUTH_SECRET" type="string" required>
+  A long random string used to sign and encrypt session tokens. Must be set in production.
+  
+  **Development:** Uses fallback `dev-only-secret-change-me` if not set
+  
+  **Production:** Generate a strong secret (at least 32 characters)
+  
+  ```bash
+  # Generate a secure secret
+  openssl rand -base64 32
+  ```
+  
+  <Warning>
+    Never commit this secret to version control. The application will throw an error if not set in production.
+  </Warning>
+</ParamField>
+
+### Database Configuration
+
+<ParamField path="TURSO_DATABASE_URL" type="string" required>
+  The connection URL for your SQLite/Turso database.
+  
+  **Local Development:** `file:./dev.db` (default)
+  
+  **Production (Turso):** `libsql://[your-database].turso.io`
+  
+  The database client automatically uses the appropriate connection method based on the URL format.
+</ParamField>
+
+<ParamField path="TURSO_AUTH_TOKEN" type="string">
+  Authentication token for Turso remote databases.
+  
+  **Local Development:** Leave empty when using `file:./dev.db`
+  
+  **Production:** Required when using a Turso remote database URL
+  
+  ```bash
+  # Get your token from Turso CLI
+  turso db tokens create my-app-prod
+  ```
+</ParamField>
+
+### Complete Example
+
+**Development (`.env.local`):**
+
+```bash
+BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_SECRET=change-this-in-production
+
+TURSO_DATABASE_URL=file:./dev.db
+TURSO_AUTH_TOKEN=
+```
+
+**Production:**
+
+```bash
+BETTER_AUTH_URL=https://your-domain.com
+BETTER_AUTH_SECRET=<generated-strong-secret>
+
+TURSO_DATABASE_URL=libsql://my-app-prod.turso.io
+TURSO_AUTH_TOKEN=<turso-auth-token>
+```
+
+## Next.js Configuration
+
+The Next.js configuration is located at `next.config.ts`:
+
+```typescript
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  /* config options here */
+};
+
+export default nextConfig;
+```
+
+This is a minimal configuration that works out of the box. You can extend it with:
+
+- **Image optimization:** Configure remote image domains
+- **Redirects/Rewrites:** Add custom routing rules
+- **Headers:** Set security headers or CORS policies
+- **Environment variables:** Expose public variables to the client
+
+See the [Next.js configuration documentation](https://nextjs.org/docs/app/api-reference/next-config-js) for all available options.
+
+## Database Configuration
+
+Drizzle ORM is configured in `drizzle.config.ts`:
+
+```typescript
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  schema: "./lib/db/schema.ts",
+  out: "./drizzle",
+  dialect: "sqlite",
+  dbCredentials: {
+    url: process.env.TURSO_DATABASE_URL ?? "file:./dev.db",
+  },
+});
+```
+
+### Configuration Options
+
+- **`schema`**: Path to your database schema file (`lib/db/schema.ts`)
+- **`out`**: Directory for generated migrations (`./drizzle`)
+- **`dialect`**: Database dialect (`sqlite` for Turso/libSQL)
+- **`dbCredentials.url`**: Database connection URL from environment variables
+
+### Database Client
+
+The database client is initialized in `lib/db.ts`:
+
+```typescript
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
+
+const url = process.env.TURSO_DATABASE_URL ?? "file:./dev.db";
+const authToken = process.env.TURSO_AUTH_TOKEN;
+
+const client = createClient({
+  url,
+  authToken,
+});
+
+export const db = drizzle(client);
+```
+
+This client works seamlessly with both local SQLite files and remote Turso databases.
+
+## Better Auth Configuration
+
+Better Auth is configured in `lib/auth.ts` with the following setup:
+
+```typescript
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { betterAuth } from "better-auth";
+import { nextCookies } from "better-auth/next-js";
+import { db } from "@/lib/db";
+import * as schema from "@/lib/db/schema";
+
+const baseURL = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
+const secret = process.env.BETTER_AUTH_SECRET ?? 
+  (process.env.NODE_ENV === "production" ? undefined : "dev-only-secret-change-me");
+
+if (!secret) {
+  throw new Error("BETTER_AUTH_SECRET must be set in production");
+}
+
+export const auth = betterAuth({
+  baseURL,
+  secret,
+  trustedOrigins: [baseURL],
+  emailAndPassword: {
+    enabled: true,
+  },
+  database: drizzleAdapter(db, {
+    provider: "sqlite",
+    schema,
+  }),
+  plugins: [nextCookies()],
+});
+```
+
+### Key Features
+
+- **Email & Password Authentication:** Enabled by default
+- **Drizzle Adapter:** Connects Better Auth to your SQLite database
+- **Next.js Cookies Plugin:** Proper cookie handling for Next.js App Router
+- **Trusted Origins:** Restricts authentication to your configured base URL
+
+### Auth API Route
+
+The auth API handler is located at `app/api/auth/[...all]/route.ts`:
+
+```typescript
+import { toNextJsHandler } from "better-auth/next-js";
+import { auth } from "@/lib/auth";
+
+export const runtime = "nodejs";
+export const { GET, POST } = toNextJsHandler(auth);
+```
+
+This catch-all route handles all Better Auth endpoints (signup, signin, signout, etc.) at `/api/auth/*`.
+
+## Client Configuration
+
+The auth client for React components is in `lib/auth-client.ts`:
+
+```typescript
+import { createAuthClient } from "better-auth/react";
+
+export const authClient = createAuthClient();
+```
+
+Use this client in your components to access auth methods like `signIn()`, `signUp()`, and `signOut()`.
+
+<Note>
+  The auth client automatically infers the API URL from your application's base URL, so no additional configuration is needed.
+</Note>

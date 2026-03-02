@@ -1,0 +1,271 @@
+---
+title: Deployment
+description: Deploy the Tendon template to production with Turso and Vercel
+---
+
+This guide walks you through deploying your Tendon application to production using Turso for the database and Vercel for hosting.
+
+## Prerequisites
+
+Before deploying, ensure you have:
+
+- A Turso account (sign up at [turso.tech](https://turso.tech))
+- A Vercel account (sign up at [vercel.com](https://vercel.com))
+- Turso CLI installed: `brew install tursodatabase/tap/turso` (macOS) or see [Turso docs](https://docs.turso.tech/cli/installation)
+- Vercel CLI installed (optional): `npm i -g vercel`
+
+## Turso Production Setup
+
+<Steps>
+  <Step title="Authenticate with Turso">
+    Sign up or log in to your Turso account:
+    
+    ```bash
+    turso auth signup
+    ```
+    
+    If you already have an account:
+    
+    ```bash
+    turso auth login
+    ```
+  </Step>
+  
+  <Step title="Create Production Database">
+    Create a new database for your production environment:
+    
+    ```bash
+    turso db create my-app-prod
+    ```
+    
+    Replace `my-app-prod` with your preferred database name.
+  </Step>
+  
+  <Step title="Get Database URL">
+    Retrieve the connection URL for your database:
+    
+    ```bash
+    turso db show my-app-prod --url
+    ```
+    
+    This will output something like:
+    ```
+    libsql://my-app-prod-[username].turso.io
+    ```
+    
+    Save this URL for the next step.
+  </Step>
+  
+  <Step title="Create Authentication Token">
+    Generate an auth token for your database:
+    
+    ```bash
+    turso db tokens create my-app-prod
+    ```
+    
+    This will output a long token string. Save this securely.
+    
+    <Warning>
+      Treat this token like a password. Never commit it to version control or share it publicly.
+    </Warning>
+  </Step>
+  
+  <Step title="Run Migrations">
+    Before deploying, run migrations on your production database. Update your `.env.local` temporarily with production credentials:
+    
+    ```bash
+    # .env.local (temporary for migration)
+    TURSO_DATABASE_URL=libsql://my-app-prod-[username].turso.io
+    TURSO_AUTH_TOKEN=<your-token>
+    ```
+    
+    Run the database setup:
+    
+    ```bash
+    pnpm db:setup
+    ```
+    
+    This runs:
+    - `pnpm auth:generate` - Generates Better Auth schema
+    - `pnpm db:generate` - Generates SQL migrations
+    - `pnpm db:migrate` - Applies migrations to the database
+    
+    <Note>
+      After migration, revert `.env.local` to your local development settings.
+    </Note>
+  </Step>
+</Steps>
+
+## Vercel Deployment
+
+<Steps>
+  <Step title="Install Vercel CLI (Optional)">
+    If you prefer CLI deployment:
+    
+    ```bash
+    npm i -g vercel
+    ```
+    
+    You can also deploy via the Vercel dashboard by connecting your Git repository.
+  </Step>
+  
+  <Step title="Configure Environment Variables">
+    Set your production environment variables in Vercel. You can do this via:
+    
+    **Vercel Dashboard:**
+    1. Go to your project settings
+    2. Navigate to "Environment Variables"
+    3. Add the following variables:
+    
+    **Vercel CLI:**
+    ```bash
+    vercel env add BETTER_AUTH_URL
+    vercel env add BETTER_AUTH_SECRET
+    vercel env add TURSO_DATABASE_URL
+    vercel env add TURSO_AUTH_TOKEN
+    ```
+    
+    ### Required Environment Variables
+    
+    <ParamField path="BETTER_AUTH_URL" type="string" required>
+      Your production domain (e.g., `https://your-domain.com` or `https://your-app.vercel.app`)
+    </ParamField>
+    
+    <ParamField path="BETTER_AUTH_SECRET" type="string" required>
+      Generate a strong random secret:
+      ```bash
+      openssl rand -base64 32
+      ```
+    </ParamField>
+    
+    <ParamField path="TURSO_DATABASE_URL" type="string" required>
+      Your Turso database URL from the previous step
+    </ParamField>
+    
+    <ParamField path="TURSO_AUTH_TOKEN" type="string" required>
+      Your Turso auth token from the previous step
+    </ParamField>
+    
+    <Warning>
+      Never use development secrets in production. Always generate new, strong secrets for your production environment.
+    </Warning>
+  </Step>
+  
+  <Step title="Deploy to Preview">
+    Deploy to a preview environment first to test:
+    
+    **Via CLI:**
+    ```bash
+    vercel
+    ```
+    
+    **Via Git:**
+    Push to a branch and Vercel will automatically create a preview deployment.
+  </Step>
+  
+  <Step title="Deploy to Production">
+    Once you've tested the preview deployment:
+    
+    **Via CLI:**
+    ```bash
+    vercel --prod
+    ```
+    
+    **Via Git:**
+    Merge to your main branch (usually `main` or `master`) and Vercel will automatically deploy to production.
+  </Step>
+  
+  <Step title="Verify Deployment">
+    After deployment:
+    
+    1. Visit your production URL
+    2. Test the authentication flow (sign up, sign in, sign out)
+    3. Check that database operations work correctly
+    4. Verify that sessions persist across page refreshes
+  </Step>
+</Steps>
+
+## Post-Deployment Configuration
+
+### Custom Domain
+
+To use a custom domain:
+
+1. Go to your Vercel project settings
+2. Navigate to "Domains"
+3. Add your custom domain
+4. Update the `BETTER_AUTH_URL` environment variable to match your custom domain
+5. Redeploy for changes to take effect
+
+### Database Replicas
+
+For better global performance, create Turso replicas in different regions:
+
+```bash
+turso db replicate my-app-prod --location <region>
+```
+
+Available regions: `ams`, `fra`, `lhr`, `sin`, `syd`, `iad`, `sfo`, etc.
+
+## CI/CD Integration
+
+For automated deployments, you can integrate the database setup into your CI pipeline:
+
+```yaml
+# Example GitHub Actions workflow
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - run: npm install -g pnpm
+      - run: pnpm install
+      - run: pnpm db:setup
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+      - run: vercel --prod
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+```
+
+<Note>
+  When using GitHub Actions, store all secrets in your repository's "Secrets and variables" settings.
+</Note>
+
+## Troubleshooting
+
+<Accordion title="Authentication errors after deployment">
+  Ensure `BETTER_AUTH_URL` matches your production domain exactly, including the protocol (`https://`).
+  
+  Also verify that `BETTER_AUTH_SECRET` is set and different from your development secret.
+</Accordion>
+
+<Accordion title="Database connection errors">
+  Check that:
+  - `TURSO_DATABASE_URL` starts with `libsql://` for production
+  - `TURSO_AUTH_TOKEN` is set and matches your database
+  - Migrations have been run on the production database
+</Accordion>
+
+<Accordion title="Build failures on Vercel">
+  Ensure all dependencies are listed in `package.json` and not just installed locally.
+  
+  Check the build logs in Vercel dashboard for specific error messages.
+</Accordion>
+
+## Environment Variables Summary
+
+| Variable | Development | Production |
+|----------|-------------|------------|
+| `BETTER_AUTH_URL` | `http://localhost:3000` | `https://your-domain.com` |
+| `BETTER_AUTH_SECRET` | `change-this-in-production` | Strong random secret (32+ chars) |
+| `TURSO_DATABASE_URL` | `file:./dev.db` | `libsql://your-db.turso.io` |
+| `TURSO_AUTH_TOKEN` | (empty) | Token from `turso db tokens create` |

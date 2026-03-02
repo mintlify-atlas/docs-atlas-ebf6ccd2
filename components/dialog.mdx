@@ -1,0 +1,415 @@
+---
+title: Dialog
+description: Modal dialog component with overlay and customizable content
+icon: 'window'
+---
+
+The Dialog component provides an accessible modal dialog with overlay, built on top of Radix UI's Dialog primitive. Perfect for confirmations, forms, or displaying detailed content.
+
+## Installation
+
+The Dialog component is included by default. To add it to a new project:
+
+```bash
+npx shadcn@latest add dialog
+```
+
+## Import
+
+```tsx
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog"
+```
+
+## Basic Usage
+
+```tsx
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+
+export default function Example() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open Dialog</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  )
+}
+```
+
+## Components
+
+### Dialog
+
+Root component that manages the dialog state.
+
+```tsx
+<Dialog open={open} onOpenChange={setOpen}>
+  {/* dialog content */}
+</Dialog>
+```
+
+**Props:**
+- `open` - Controlled open state
+- `onOpenChange` - Callback when open state changes
+- `defaultOpen` - Default open state (uncontrolled)
+
+### DialogTrigger
+
+Button that opens the dialog.
+
+```tsx
+<DialogTrigger asChild>
+  <Button>Open</Button>
+</DialogTrigger>
+```
+
+**Tip:** Use `asChild` to avoid wrapper elements.
+
+### DialogContent
+
+The dialog content container with overlay.
+
+```tsx
+<DialogContent showCloseButton={true}>
+  {/* content */}
+</DialogContent>
+```
+
+**Props:**
+- `showCloseButton` (boolean, default: `true`) - Show X close button
+
+**Features:**
+- Automatic overlay
+- Centered positioning
+- Responsive max-width
+- Close button (optional)
+- Click outside to close
+- Press Escape to close
+
+### DialogHeader
+
+Container for dialog title and description.
+
+```tsx
+<DialogHeader>
+  <DialogTitle>Title</DialogTitle>
+  <DialogDescription>Description</DialogDescription>
+</DialogHeader>
+```
+
+### DialogTitle
+
+Dialog heading (required for accessibility).
+
+```tsx
+<DialogTitle>Confirm Deletion</DialogTitle>
+```
+
+### DialogDescription
+
+Dialog description text.
+
+```tsx
+<DialogDescription>
+  This will permanently delete your account and all associated data.
+</DialogDescription>
+```
+
+### DialogFooter
+
+Container for dialog actions.
+
+```tsx
+<DialogFooter showCloseButton={false}>
+  <Button variant="outline">Cancel</Button>
+  <Button>Confirm</Button>
+</DialogFooter>
+```
+
+**Props:**
+- `showCloseButton` (boolean, default: `false`) - Include auto-close button
+
+### DialogClose
+
+Button that closes the dialog.
+
+```tsx
+<DialogClose asChild>
+  <Button variant="outline">Cancel</Button>
+</DialogClose>
+```
+
+## Examples
+
+### Confirmation Dialog
+
+```tsx
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+
+export default function ConfirmDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="destructive">Delete Account</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. This will permanently delete your
+            account and remove your data from our servers.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <Button variant="destructive">Delete</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+```
+
+### Form Dialog
+
+```tsx
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
+export default function FormDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Edit Profile</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit profile</DialogTitle>
+          <DialogDescription>
+            Make changes to your profile here. Click save when you're done.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" defaultValue="John Doe" />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="username">Username</Label>
+            <Input id="username" defaultValue="@johndoe" />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="submit">Save changes</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+```
+
+### Controlled Dialog
+
+```tsx
+"use client"
+
+import { useState } from "react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+
+export default function ControlledDialog() {
+  const [open, setOpen] = useState(false)
+
+  const handleSubmit = () => {
+    // Do something
+    setOpen(false)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>Open Dialog</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Submit Form</DialogTitle>
+          <DialogDescription>
+            This dialog is controlled programmatically.
+          </DialogDescription>
+        </DialogHeader>
+        <Button onClick={handleSubmit}>Submit</Button>
+      </DialogContent>
+    </Dialog>
+  )
+}
+```
+
+### Without Close Button
+
+```tsx
+<Dialog>
+  <DialogTrigger asChild>
+    <Button>Open</Button>
+  </DialogTrigger>
+  <DialogContent showCloseButton={false}>
+    <DialogHeader>
+      <DialogTitle>No Close Button</DialogTitle>
+      <DialogDescription>
+        You must click a button to close this dialog.
+      </DialogDescription>
+    </DialogHeader>
+    <DialogFooter showCloseButton>
+      {/* Automatically adds close button */}
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+### Custom Size
+
+```tsx
+{/* Small */}
+<DialogContent className="sm:max-w-md">
+  {/* content */}
+</DialogContent>
+
+{/* Large */}
+<DialogContent className="sm:max-w-3xl">
+  {/* content */}
+</DialogContent>
+
+{/* Full width */}
+<DialogContent className="max-w-[95vw]">
+  {/* content */}
+</DialogContent>
+```
+
+## Animation
+
+The dialog includes smooth enter/exit animations:
+
+- **Overlay**: Fade in/out
+- **Content**: Fade + zoom in/out
+- **Duration**: 200ms
+
+## Accessibility Features
+
+- **Focus trap**: Focus is trapped within the dialog
+- **Focus restore**: Focus returns to trigger on close
+- **Escape key**: Press Escape to close
+- **Click outside**: Click overlay to close
+- **ARIA attributes**: Proper `role="dialog"`, `aria-labelledby`, `aria-describedby`
+- **Required title**: DialogTitle is required for accessibility
+- **Keyboard navigation**: Full keyboard support
+
+## Best Practices
+
+### Always Include a Title
+
+For accessibility, always include a `DialogTitle`:
+
+```tsx
+<DialogHeader>
+  <DialogTitle>Dialog Title</DialogTitle>
+</DialogHeader>
+```
+
+If you need to visually hide it:
+
+```tsx
+<DialogTitle className="sr-only">Hidden Title</DialogTitle>
+```
+
+### Use DialogTrigger asChild
+
+Avoid wrapper elements by using `asChild`:
+
+```tsx
+{/* Good */}
+<DialogTrigger asChild>
+  <Button>Open</Button>
+</DialogTrigger>
+
+{/* Avoid - creates extra wrapper */}
+<DialogTrigger>
+  <Button>Open</Button>
+</DialogTrigger>
+```
+
+### Handle Form Submission
+
+Close the dialog after successful form submission:
+
+```tsx
+const [open, setOpen] = useState(false)
+
+const onSubmit = async (data) => {
+  await saveData(data)
+  setOpen(false)
+}
+```
+
+## Portal Behavior
+
+The dialog content is rendered in a portal at the end of the document body. This ensures:
+- Proper z-index stacking
+- No clipping by parent containers
+- Overlay covers entire viewport
+
+## Source Code
+
+View the source: `components/ui/dialog.tsx:1`

@@ -1,0 +1,465 @@
+---
+title: Toast
+description: Toast notification system using Sonner for displaying brief messages
+icon: 'bell'
+---
+
+The Toast component provides a notification system for displaying brief, auto-dismissing messages to users. Built with Sonner, it offers a polished toast experience with icons, variants, and automatic theming.
+
+## Installation
+
+The Toast component is included by default. To add it to a new project:
+
+```bash
+npx shadcn@latest add sonner
+```
+
+You'll also need to install the dependency:
+
+```bash
+npm install sonner
+```
+
+## Setup
+
+Add the Toaster component to your root layout:
+
+```tsx
+import { Toaster } from "@/components/ui/sonner"
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <Toaster />
+      </body>
+    </html>
+  )
+}
+```
+
+## Import
+
+```tsx
+import { toast } from "sonner"
+```
+
+## Basic Usage
+
+```tsx
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+
+export default function Example() {
+  return (
+    <Button onClick={() => toast("Hello, World!")}>
+      Show Toast
+    </Button>
+  )
+}
+```
+
+## Toast Types
+
+### Default
+
+Standard toast notification.
+
+```tsx
+toast("Your message here")
+```
+
+### Success
+
+For successful actions.
+
+```tsx
+toast.success("Account created successfully!")
+```
+
+### Error
+
+For error messages.
+
+```tsx
+toast.error("Failed to save changes")
+```
+
+### Warning
+
+For warnings.
+
+```tsx
+toast.warning("Your session will expire soon")
+```
+
+### Info
+
+For informational messages.
+
+```tsx
+toast.info("New update available")
+```
+
+### Loading
+
+For loading states.
+
+```tsx
+const toastId = toast.loading("Saving changes...")
+
+// Later, dismiss it
+toast.dismiss(toastId)
+```
+
+## With Description
+
+Add a description for more context:
+
+```tsx
+toast("Event created", {
+  description: "Your event has been scheduled for tomorrow at 3pm",
+})
+```
+
+## With Action
+
+Add an action button:
+
+```tsx
+toast("Event created", {
+  action: {
+    label: "Undo",
+    onClick: () => console.log("Undo"),
+  },
+})
+```
+
+## Toast Duration
+
+Control how long the toast is visible (in milliseconds):
+
+```tsx
+toast("This disappears quickly", {
+  duration: 2000, // 2 seconds
+})
+```
+
+## Promise Toasts
+
+Show different messages based on promise state:
+
+```tsx
+toast.promise(
+  fetchData(),
+  {
+    loading: "Loading data...",
+    success: "Data loaded successfully!",
+    error: "Failed to load data",
+  }
+)
+```
+
+## Examples
+
+### Form Submission
+
+```tsx
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { toast } from "sonner"
+
+export default function FormExample() {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    const promise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        Math.random() > 0.5 ? resolve(true) : reject()
+      }, 2000)
+    })
+
+    toast.promise(promise, {
+      loading: "Submitting form...",
+      success: "Form submitted successfully!",
+      error: "Failed to submit form",
+    })
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <Input placeholder="Enter your name" />
+      <Button type="submit">Submit</Button>
+    </form>
+  )
+}
+```
+
+### Delete Confirmation
+
+```tsx
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+
+export default function DeleteExample() {
+  const handleDelete = () => {
+    toast.error("Item deleted", {
+      description: "The item has been permanently removed",
+      action: {
+        label: "Undo",
+        onClick: () => toast.success("Delete cancelled"),
+      },
+    })
+  }
+
+  return (
+    <Button variant="destructive" onClick={handleDelete}>
+      Delete Item
+    </Button>
+  )
+}
+```
+
+### Multiple Toasts
+
+```tsx
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+
+export default function MultipleToasts() {
+  const showNotifications = () => {
+    toast.success("Profile updated")
+    toast.info("3 new messages")
+    toast.warning("Storage almost full")
+  }
+
+  return (
+    <Button onClick={showNotifications}>
+      Show Notifications
+    </Button>
+  )
+}
+```
+
+### Dismissing Toasts
+
+```tsx
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+
+export default function DismissExample() {
+  const showPersistentToast = () => {
+    const toastId = toast("This toast won't auto-dismiss", {
+      duration: Infinity,
+      action: {
+        label: "Dismiss",
+        onClick: () => toast.dismiss(toastId),
+      },
+    })
+  }
+
+  return (
+    <Button onClick={showPersistentToast}>
+      Show Persistent Toast
+    </Button>
+  )
+}
+```
+
+### Custom Position
+
+Configure toast position in the Toaster component:
+
+```tsx
+import { Toaster } from "@/components/ui/sonner"
+
+export default function Layout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <Toaster position="top-right" />
+      </body>
+    </html>
+  )
+}
+```
+
+Available positions:
+- `top-left`
+- `top-center`
+- `top-right`
+- `bottom-left`
+- `bottom-center` (default)
+- `bottom-right`
+
+## Toaster Props
+
+Configure the Toaster component:
+
+```tsx
+<Toaster
+  position="bottom-right"
+  expand={false}
+  richColors
+  closeButton
+/>
+```
+
+<ParamField path="position" type="string" default="bottom-center">
+  Toast position on screen
+</ParamField>
+
+<ParamField path="expand" type="boolean" default="false">
+  Expand toasts on hover
+</ParamField>
+
+<ParamField path="richColors" type="boolean" default="false">
+  Use colored backgrounds for variants
+</ParamField>
+
+<ParamField path="closeButton" type="boolean" default="false">
+  Show close button on all toasts
+</ParamField>
+
+<ParamField path="duration" type="number" default="4000">
+  Default duration in milliseconds
+</ParamField>
+
+## Toast Options
+
+```tsx
+toast("Message", {
+  description: "Additional context",
+  duration: 5000,
+  action: {
+    label: "Action",
+    onClick: () => {},
+  },
+  cancel: {
+    label: "Cancel",
+    onClick: () => {},
+  },
+  onDismiss: () => console.log("dismissed"),
+  onAutoClose: () => console.log("auto closed"),
+})
+```
+
+## Custom Icons
+
+The Toaster component includes custom icons:
+
+- **Success**: CircleCheckIcon
+- **Info**: InfoIcon
+- **Warning**: TriangleAlertIcon
+- **Error**: OctagonXIcon
+- **Loading**: Loader2Icon (animated)
+
+These are configured in `components/ui/sonner.tsx:20`
+
+## Theme Integration
+
+The Toaster automatically adapts to your theme:
+
+- Syncs with `next-themes`
+- Uses CSS variables for colors
+- Supports light/dark mode
+- Custom border radius from theme
+
+## Accessibility Features
+
+- **ARIA live region**: Announces toasts to screen readers
+- **Keyboard support**: Dismiss with Escape key
+- **Focus management**: Proper focus handling
+- **Pause on hover**: Toasts pause auto-dismiss on hover
+- **Semantic icons**: Icons provide visual context
+
+## Best Practices
+
+### Keep Messages Brief
+
+```tsx
+// Good
+toast.success("Settings saved")
+
+// Avoid
+toast.success("Your settings have been successfully saved to the database and will be applied immediately")
+```
+
+### Use Appropriate Variants
+
+```tsx
+// Good - use error for failures
+toast.error("Failed to save")
+
+// Avoid - using default for errors
+toast("Failed to save")
+```
+
+### Provide Context with Descriptions
+
+```tsx
+toast.success("Email sent", {
+  description: "Your message was delivered to [email protected]",
+})
+```
+
+### Use Promise Toasts for Async Actions
+
+```tsx
+toast.promise(saveData(), {
+  loading: "Saving...",
+  success: "Saved!",
+  error: "Failed to save",
+})
+```
+
+## Source Code
+
+View the source: `components/ui/sonner.tsx:1`
+
+<Accordion title="View Full Source">
+```tsx
+"use client";
+
+import {
+  CircleCheckIcon,
+  InfoIcon,
+  Loader2Icon,
+  OctagonXIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { Toaster as Sonner, type ToasterProps } from "sonner";
+
+const Toaster = ({ ...props }: ToasterProps) => {
+  const { theme = "system" } = useTheme();
+
+  return (
+    <Sonner
+      theme={theme as ToasterProps["theme"]}
+      className="toaster group"
+      icons={{
+        success: <CircleCheckIcon className="size-4" />,
+        info: <InfoIcon className="size-4" />,
+        warning: <TriangleAlertIcon className="size-4" />,
+        error: <OctagonXIcon className="size-4" />,
+        loading: <Loader2Icon className="size-4 animate-spin" />,
+      }}
+      style={{
+        "--normal-bg": "var(--popover)",
+        "--normal-text": "var(--popover-foreground)",
+        "--normal-border": "var(--border)",
+        "--border-radius": "var(--radius)",
+      } as React.CSSProperties}
+      {...props}
+    />
+  );
+};
+
+export { Toaster };
+```
+</Accordion>

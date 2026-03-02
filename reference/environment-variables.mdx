@@ -1,0 +1,180 @@
+---
+title: 'Environment Variables'
+description: 'Complete reference for all environment variables used in the Tendon template'
+icon: 'key'
+---
+
+## Overview
+
+Tendon uses environment variables to configure authentication, database connections, and other runtime settings. All environment variables should be defined in a `.env` file at the root of your project.
+
+<Warning>
+  Never commit your `.env` file to version control. The `.env.example` file is provided as a template.
+</Warning>
+
+## Configuration File
+
+Copy the example environment file to get started:
+
+```bash
+cp .env.example .env
+```
+
+Then update the values according to your environment.
+
+## Authentication Variables
+
+These variables configure Better Auth for user authentication.
+
+<ParamField path="BETTER_AUTH_URL" type="string" required>
+  The base URL where your application is hosted. This is used by Better Auth for callback URLs and session management.
+  
+  **Development:** `http://localhost:3000`
+  
+  **Production:** Your production domain (e.g., `https://yourdomain.com`)
+  
+  <Warning>
+    Make sure this matches your actual deployment URL in production to avoid authentication issues.
+  </Warning>
+</ParamField>
+
+<ParamField path="BETTER_AUTH_SECRET" type="string" required>
+  A secret key used to sign and encrypt authentication tokens and sessions. Must be a strong, random string.
+  
+  **Default:** `change-this-in-production`
+  
+  <Warning>
+    **Critical Security:** Always change this in production! Use a cryptographically secure random string (at least 32 characters).
+  </Warning>
+  
+  Generate a secure secret:
+  
+  ```bash
+  # Using OpenSSL
+  openssl rand -base64 32
+  
+  # Using Node.js
+  node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+  ```
+</ParamField>
+
+## Database Variables
+
+These variables configure the Turso (LibSQL) database connection.
+
+<ParamField path="TURSO_DATABASE_URL" type="string" required>
+  The connection URL for your Turso database.
+  
+  **Local Development:** `file:./dev.db` (uses a local SQLite file)
+  
+  **Production:** `libsql://[your-database].turso.io`
+  
+  <Info>
+    In development, the local file database allows you to work offline without setting up Turso.
+  </Info>
+  
+  **Examples:**
+  
+  ```bash
+  # Local development
+  TURSO_DATABASE_URL=file:./dev.db
+  
+  # Turso cloud database
+  TURSO_DATABASE_URL=libsql://my-database-username.turso.io
+  ```
+</ParamField>
+
+<ParamField path="TURSO_AUTH_TOKEN" type="string">
+  Authentication token for connecting to Turso cloud databases. Not required for local file-based databases.
+  
+  **Default:** Empty (not needed for local development)
+  
+  **Production:** Your Turso database authentication token
+  
+  <Info>
+    Leave this empty when using `file:./dev.db` for local development.
+  </Info>
+  
+  Get your auth token from the Turso dashboard:
+  
+  ```bash
+  turso db tokens create [database-name]
+  ```
+</ParamField>
+
+## Environment-Specific Configuration
+
+### Development Setup
+
+```bash
+BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_SECRET=change-this-in-production
+TURSO_DATABASE_URL=file:./dev.db
+TURSO_AUTH_TOKEN=
+```
+
+### Production Setup
+
+```bash
+BETTER_AUTH_URL=https://yourdomain.com
+BETTER_AUTH_SECRET=your-cryptographically-secure-random-string-here
+TURSO_DATABASE_URL=libsql://your-database.turso.io
+TURSO_AUTH_TOKEN=your-turso-auth-token-here
+```
+
+## Validation
+
+The template validates required environment variables at runtime. If any required variables are missing or invalid, the application will fail to start with a descriptive error message.
+
+## Security Best Practices
+
+<AccordionGroup>
+  <Accordion title="Never commit secrets to version control">
+    Always add `.env` to your `.gitignore` file. The template includes this by default.
+  </Accordion>
+  
+  <Accordion title="Use different secrets per environment">
+    Never reuse the same `BETTER_AUTH_SECRET` across development, staging, and production environments.
+  </Accordion>
+  
+  <Accordion title="Rotate secrets regularly">
+    Change your authentication secrets periodically, especially if you suspect they may have been compromised.
+  </Accordion>
+  
+  <Accordion title="Use environment-specific deployment secrets">
+    On platforms like Vercel, Netlify, or Railway, use their environment variable management UI instead of committing secrets to your repository.
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Authentication not working">
+    - Verify `BETTER_AUTH_URL` matches your actual URL (including protocol)
+    - Ensure `BETTER_AUTH_SECRET` is set and not the default value in production
+    - Check that your `.env` file is in the project root
+  </Accordion>
+  
+  <Accordion title="Database connection errors">
+    - For local development, ensure `TURSO_DATABASE_URL=file:./dev.db`
+    - For production, verify your Turso URL and auth token are correct
+    - Run `pnpm db:setup` to initialize the database schema
+  </Accordion>
+  
+  <Accordion title="Environment variables not loading">
+    - Restart your development server after changing `.env`
+    - Ensure the file is named `.env` exactly (not `.env.txt` or similar)
+    - Check that the file is in the project root, not in a subdirectory
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Database Setup" icon="database" href="/setup/database">
+    Configure and migrate your database
+  </Card>
+  <Card title="Authentication" icon="shield-halved" href="/setup/authentication">
+    Set up user authentication
+  </Card>
+</CardGroup>

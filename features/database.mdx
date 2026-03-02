@@ -1,0 +1,305 @@
+---
+title: "Database"
+description: "Drizzle ORM with Turso (libSQL) for local and production databases"
+---
+
+Tendon uses [Drizzle ORM](https://orm.drizzle.team) with [Turso](https://turso.tech) (libSQL) for database management. This setup provides a type-safe, performant database layer that works seamlessly in both local development and production.
+
+## Overview
+
+The database stack includes:
+
+- **Drizzle ORM**: Type-safe SQL ORM for TypeScript
+- **libSQL/Turso**: SQLite-compatible database that works locally and in the cloud
+- **Local development**: File-based SQLite database (`file:./dev.db`)
+- **Production**: Turso cloud database with edge replication
+- **Schema management**: Type-safe schema definitions and migrations
+
+## Database Configuration
+
+The database client is configured in `lib/db.ts`:
+
+```typescript
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
+
+const url = process.env.TURSO_DATABASE_URL ?? "file:./dev.db";
+const authToken = process.env.TURSO_AUTH_TOKEN;
+
+const client = createClient({
+  url,
+  authToken,
+});
+
+export const db = drizzle(client);
+```
+
+<Tip>
+  The configuration automatically uses a local SQLite file in development and connects to Turso in production when environment variables are set.
+</Tip>
+
+## Environment Setup
+
+### Local Development
+
+No environment variables needed! The database defaults to `file:./dev.db`, a local SQLite file in your project root.
+
+```bash
+# .env (optional for local development)
+# Uses file:./dev.db by default
+```
+
+### Production (Turso)
+
+For production, add your Turso credentials to `.env`:
+
+```bash
+TURSO_DATABASE_URL=libsql://your-database.turso.io
+TURSO_AUTH_TOKEN=your-auth-token
+```
+
+<Note>
+  Get your Turso credentials by creating a database at [turso.tech](https://turso.tech). The free tier includes generous limits for hobby projects.
+</Note>
+
+## Drizzle Configuration
+
+Drizzle Kit is configured in `drizzle.config.ts`:
+
+```typescript
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  schema: "./lib/db/schema.ts",
+  out: "./drizzle",
+  dialect: "sqlite",
+  dbCredentials: {
+    url: process.env.TURSO_DATABASE_URL ?? "file:./dev.db",
+  },
+});
+```
+
+This configuration:
+
+- **schema**: Points to your schema definitions in `lib/db/schema.ts`
+- **out**: Migration files are saved to the `./drizzle` directory
+- **dialect**: Uses SQLite dialect (compatible with Turso)
+- **dbCredentials**: Connects to local or production database
+
+## Database Commands
+
+Tendon includes convenient npm scripts for database management:
+
+### Generate Migrations
+
+Generate migration files from your schema:
+
+```bash
+pnpm db:generate
+```
+
+This analyzes your schema and creates SQL migration files in the `./drizzle` directory.
+
+### Run Migrations
+
+Apply pending migrations to your database:
+
+```bash
+pnpm db:migrate
+```
+
+### Full Setup
+
+Generate auth schema, create migrations, and apply them:
+
+```bash
+pnpm db:setup
+```
+
+This runs three commands in sequence:
+
+1. `pnpm auth:generate` - Generate Better Auth schema
+2. `pnpm db:generate` - Generate migration files
+3. `pnpm db:migrate` - Apply migrations to database
+
+<Warning>
+  Always run `db:setup` or at minimum `db:generate && db:migrate` after cloning the repository or modifying the schema.
+</Warning>
+
+## Schema Definition
+
+Schemas are defined in `lib/db/schema.ts`. Here's an example from the authentication tables:
+
+```typescript
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { relations, sql } from "drizzle-orm";
+
+export const user = sqliteTable("user", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: integer("email_verified", { mode: "boolean" }).default(false).notNull(),
+  image: text("image"),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+```
+
+### Adding Your Own Tables
+
+To add a new table, define it in `lib/db/schema.ts`:
+
+```typescript
+export const posts = sqliteTable("posts", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content"),
+  authorId: text("author_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .notNull(),
+});
+
+export const postsRelations = relations(posts, ({ one }) => ({
+  author: one(user, {
+    fields: [posts.authorId],
+    references: [user.id],
+  }),
+}));
+```
+
+Then run:
+
+```bash
+pnpm db:generate
+pnpm db:migrate
+```
+
+## Using the Database
+
+### Querying Data
+
+```typescript
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+
+// Select all users
+const users = await db.select().from(user);
+
+// Select with filter
+const john = await db.select().from(user).where(eq(user.email, "john@example.com"));
+
+// Select with relations
+const usersWithSessions = await db.query.user.findMany({
+  with: {
+    sessions: true,
+  },
+});
+```
+
+### Inserting Data
+
+```typescript
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
+
+await db.insert(user).values({
+  id: crypto.randomUUID(),
+  name: "Jane Doe",
+  email: "jane@example.com",
+  emailVerified: false,
+});
+```
+
+### Updating Data
+
+```typescript
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+
+await db
+  .update(user)
+  .set({ emailVerified: true })
+  .where(eq(user.email, "jane@example.com"));
+```
+
+### Deleting Data
+
+```typescript
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+
+await db.delete(user).where(eq(user.id, userId));
+```
+
+## Type Safety
+
+Drizzle provides full type safety:
+
+```typescript
+const users = await db.select().from(user);
+// users is typed as: { id: string; name: string; email: string; ... }[]
+
+const name = users[0].name; // TypeScript knows this is a string
+const invalid = users[0].invalid; // TypeScript error: Property doesn't exist
+```
+
+## Local Database File
+
+The local database is stored at `./dev.db` in your project root. You can:
+
+- Inspect it with SQLite tools like [DB Browser for SQLite](https://sqlitebrowser.org/)
+- Delete it to reset your local database
+- Add it to `.gitignore` (already configured)
+
+<Warning>
+  The `dev.db` file is already in `.gitignore`. Never commit your local database to version control.
+</Warning>
+
+## Production Deployment
+
+When deploying to production:
+
+1. Create a Turso database:
+   ```bash
+   turso db create my-app
+   ```
+
+2. Get your database URL and auth token:
+   ```bash
+   turso db show my-app --url
+   turso db tokens create my-app
+   ```
+
+3. Add environment variables to your hosting platform:
+   ```bash
+   TURSO_DATABASE_URL=libsql://my-app.turso.io
+   TURSO_AUTH_TOKEN=your-token-here
+   ```
+
+4. Run migrations in production:
+   ```bash
+   pnpm db:migrate
+   ```
+
+<Tip>
+  Turso provides edge replication, meaning your database can be replicated close to your users for low-latency reads globally.
+</Tip>
+
+## Next Steps
+
+- [Authentication](/features/authentication) - Learn about the auth system built on this database
+- [Drizzle ORM Docs](https://orm.drizzle.team) - Official Drizzle documentation
+- [Turso Docs](https://docs.turso.tech) - Learn more about Turso
+- Explore the generated schema in `lib/db/schema.ts`
+- Add custom tables for your application

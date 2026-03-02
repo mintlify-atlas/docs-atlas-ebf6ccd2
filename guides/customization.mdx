@@ -1,0 +1,410 @@
+---
+title: Customization
+description: Customize the Tendon template with your own branding, components, and features
+---
+
+The Tendon template is designed to be highly customizable. This guide shows you how to adapt it to your specific needs.
+
+## Styling and Theming
+
+### Tailwind CSS Configuration
+
+The template uses Tailwind CSS v4 with CSS variables for theming. All theme customization is done in `app/globals.css`:
+
+```css
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+```
+
+### Color Scheme
+
+Customize your color palette by modifying the CSS variables in `app/globals.css`:
+
+```css
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.147 0.004 49.25);
+  --primary: oklch(0.216 0.006 56.043);
+  --primary-foreground: oklch(0.985 0.001 106.423);
+  /* ... more color variables */
+}
+
+.dark {
+  --background: oklch(0.147 0.004 49.25);
+  --foreground: oklch(0.985 0.001 106.423);
+  --primary: oklch(0.923 0.003 48.717);
+  /* ... dark mode colors */
+}
+```
+
+The template uses the **OKLCH color space** for better perceptual uniformity. You can:
+
+- Use a color picker like [OKLCH Color Picker](https://oklch.com/) to generate values
+- Adjust the base color scheme (`stone` by default)
+- Modify border radius with the `--radius` variable
+
+### Border Radius
+
+The global border radius is controlled by `--radius`. Radius utilities scale from this value:
+
+- `--radius-sm`: `--radius` - 4px
+- `--radius-md`: `--radius` - 2px
+- `--radius-lg`: `--radius` (default)
+- `--radius-xl`: `--radius` + 4px
+- `--radius-2xl`: `--radius` + 8px
+
+Change the base radius:
+
+```css
+:root {
+  --radius: 0.5rem; /* More square */
+  /* or */
+  --radius: 1rem; /* More rounded */
+}
+```
+
+### Fonts
+
+The template uses Geist Sans and Geist Mono. Customize fonts in `app/layout.tsx`:
+
+```typescript
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
+
+// Replace with your own fonts
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'] });
+```
+
+Update the CSS variables in `app/globals.css`:
+
+```css
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-mono: 'JetBrains Mono', monospace;
+}
+```
+
+## Adding Components with shadcn/ui
+
+The template uses shadcn/ui for components. The configuration is in `components.json`:
+
+```json
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "app/globals.css",
+    "baseColor": "stone",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  }
+}
+```
+
+### Add New Components
+
+Use the shadcn CLI to add components:
+
+```bash
+npx shadcn@latest add [component-name]
+```
+
+Examples:
+
+```bash
+# Add a dropdown menu
+npx shadcn@latest add dropdown-menu
+
+# Add a data table
+npx shadcn@latest add table
+
+# Add a date picker
+npx shadcn@latest add calendar
+```
+
+Components are added to `components/ui/` and can be imported:
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { DropdownMenu } from "@/components/ui/dropdown-menu";
+```
+
+### Customize Existing Components
+
+All UI components are in `components/ui/`. You can modify them directly:
+
+```tsx
+// components/ui/button.tsx
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-md...",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground...",
+        destructive: "bg-destructive text-destructive-foreground...",
+        // Add your own variant
+        custom: "bg-gradient-to-r from-purple-500 to-pink-500...",
+      },
+    },
+  }
+);
+```
+
+### Change Component Style
+
+The template uses the "new-york" style. To switch to "default":
+
+```json
+// components.json
+{
+  "style": "default"
+}
+```
+
+Then reinstall components:
+
+```bash
+rm -rf components/ui
+npx shadcn@latest add button card input
+```
+
+## Customizing Authentication
+
+### Modify Auth Schema
+
+The auth schema is auto-generated in `lib/db/schema.ts`. To add custom fields to the user table:
+
+1. **Add fields to the schema:**
+
+```typescript
+// lib/db/schema.ts
+export const user = sqliteTable("user", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: integer("email_verified", { mode: "boolean" }).default(false).notNull(),
+  image: text("image"),
+  
+  // Add custom fields
+  bio: text("bio"),
+  website: text("website"),
+  isAdmin: integer("is_admin", { mode: "boolean" }).default(false),
+  
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+```
+
+2. **Generate and run migration:**
+
+```bash
+pnpm db:generate
+pnpm db:migrate
+```
+
+### Add OAuth Providers
+
+Better Auth supports many OAuth providers. To add GitHub auth:
+
+1. **Install the plugin:**
+
+```bash
+pnpm add better-auth
+```
+
+2. **Update auth config in `lib/auth.ts`:**
+
+```typescript
+import { betterAuth } from "better-auth";
+import { github } from "better-auth/plugins";
+
+export const auth = betterAuth({
+  baseURL,
+  secret,
+  emailAndPassword: {
+    enabled: true,
+  },
+  socialProviders: {
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    },
+  },
+  database: drizzleAdapter(db, {
+    provider: "sqlite",
+    schema,
+  }),
+  plugins: [nextCookies()],
+});
+```
+
+3. **Add environment variables:**
+
+```bash
+# .env.local
+GITHUB_CLIENT_ID=your-client-id
+GITHUB_CLIENT_SECRET=your-client-secret
+```
+
+4. **Update your UI to use the provider:**
+
+```tsx
+import { authClient } from "@/lib/auth-client";
+
+<button onClick={() => authClient.signIn.social({ provider: "github" })}>
+  Sign in with GitHub
+</button>
+```
+
+### Customize Auth Flows
+
+Modify the auth client in `lib/auth-client.ts` to add custom behavior:
+
+```typescript
+import { createAuthClient } from "better-auth/react";
+
+export const authClient = createAuthClient({
+  baseURL: process.env.NEXT_PUBLIC_APP_URL,
+  // Add custom configuration
+});
+
+// Add custom auth methods
+export const signInWithEmail = async (email: string, password: string) => {
+  const result = await authClient.signIn.email({ email, password });
+  
+  // Custom logic after sign in
+  if (result.data) {
+    console.log("User signed in:", result.data.user);
+    // Track analytics, etc.
+  }
+  
+  return result;
+};
+```
+
+## Modifying the Database Schema
+
+### Add New Tables
+
+Create new tables in `lib/db/schema.ts`:
+
+```typescript
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+
+export const posts = sqliteTable("posts", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  authorId: text("author_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .notNull(),
+});
+
+// Add relations
+export const userRelations = relations(user, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+  posts: many(posts), // Add this
+}));
+
+export const postRelations = relations(posts, ({ one }) => ({
+  author: one(user, {
+    fields: [posts.authorId],
+    references: [user.id],
+  }),
+}));
+```
+
+### Generate Migrations
+
+After modifying the schema:
+
+```bash
+pnpm db:generate
+pnpm db:migrate
+```
+
+### Query the Database
+
+Use Drizzle ORM to query your tables:
+
+```typescript
+import { db } from "@/lib/db";
+import { posts, user } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+
+// Get all posts with author
+const allPosts = await db
+  .select()
+  .from(posts)
+  .leftJoin(user, eq(posts.authorId, user.id));
+
+// Create a new post
+await db.insert(posts).values({
+  id: crypto.randomUUID(),
+  title: "My First Post",
+  content: "Hello, world!",
+  authorId: userId,
+});
+```
+
+## Path Aliases
+
+The template includes path aliases configured in `components.json` and `tsconfig.json`:
+
+```json
+{
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  }
+}
+```
+
+Use them in your imports:
+
+```typescript
+import { Button } from "@/components/ui/button";
+import { db } from "@/lib/db";
+import { useMobile } from "@/hooks/use-mobile";
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Deployment" icon="rocket" href="/guides/deployment">
+    Deploy your customized app to production
+  </Card>
+  <Card title="Project Structure" icon="folder-tree" href="/guides/project-structure">
+    Learn about the file organization
+  </Card>
+</CardGroup>

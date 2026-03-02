@@ -1,0 +1,370 @@
+---
+title: 'npm Scripts'
+description: 'Complete reference for all available npm/pnpm scripts in the Tendon template'
+icon: 'terminal'
+---
+
+## Overview
+
+Tendon includes a comprehensive set of npm scripts to streamline development, building, and database management. All scripts can be run using `pnpm`, `npm`, or `yarn`.
+
+<Info>
+  The examples below use `pnpm`. Replace with `npm run` or `yarn` based on your package manager preference.
+</Info>
+
+## Development Scripts
+
+<AccordionGroup>
+  <Accordion title="dev" icon="code">
+    **Command:** `pnpm dev`
+    
+    Starts the development server with hot module replacement (HMR).
+    
+    ```bash
+    pnpm dev
+    ```
+    
+    **What it does:**
+    - Starts the Vinext development server
+    - Enables hot reload for instant updates
+    - Runs on `http://localhost:3000` by default
+    - Watches for file changes in your source code
+    
+    **When to use:**
+    - During active development
+    - When you want instant feedback on code changes
+    - For testing features locally
+    
+    <Tip>
+      The server will automatically restart when you modify server-side code and refresh the browser when you change client-side code.
+    </Tip>
+  </Accordion>
+  
+  <Accordion title="build" icon="hammer">
+    **Command:** `pnpm build`
+    
+    Creates an optimized production build of your application.
+    
+    ```bash
+    pnpm build
+    ```
+    
+    **What it does:**
+    - Compiles TypeScript to JavaScript
+    - Bundles and optimizes all code
+    - Minifies JavaScript and CSS
+    - Generates static assets
+    - Creates production-ready output in `.next` directory
+    
+    **When to use:**
+    - Before deploying to production
+    - To test production builds locally
+    - To verify there are no build errors
+    - As part of your CI/CD pipeline
+    
+    <Warning>
+      Always run `pnpm build` before deploying to catch any build-time errors.
+    </Warning>
+  </Accordion>
+  
+  <Accordion title="start" icon="play">
+    **Command:** `pnpm start`
+    
+    Starts the production server using the built application.
+    
+    ```bash
+    pnpm start
+    ```
+    
+    **What it does:**
+    - Serves the production build created by `pnpm build`
+    - Runs in production mode (optimized performance)
+    - No hot reload or development features
+    
+    **When to use:**
+    - After running `pnpm build`
+    - To test the production build locally
+    - To verify production performance
+    
+    <Info>
+      You must run `pnpm build` before `pnpm start`, or you'll get an error about missing build output.
+    </Info>
+  </Accordion>
+</AccordionGroup>
+
+## Code Quality Scripts
+
+<AccordionGroup>
+  <Accordion title="fmt" icon="paintbrush">
+    **Command:** `pnpm fmt`
+    
+    Formats your code using oxfmt (a fast Rust-based formatter).
+    
+    ```bash
+    pnpm fmt
+    ```
+    
+    **What it does:**
+    - Automatically formats all code files
+    - Ensures consistent code style across the project
+    - Fixes formatting issues automatically
+    
+    **When to use:**
+    - Before committing code
+    - To maintain consistent formatting
+    - As part of pre-commit hooks
+    
+    <Tip>
+      Consider setting up your editor to run this automatically on save.
+    </Tip>
+  </Accordion>
+  
+  <Accordion title="lint" icon="magnifying-glass">
+    **Command:** `pnpm lint`
+    
+    Runs ESLint to check for code quality issues and potential bugs.
+    
+    ```bash
+    pnpm lint
+    ```
+    
+    **What it does:**
+    - Checks for code quality issues
+    - Identifies potential bugs and anti-patterns
+    - Enforces coding standards
+    - Reports accessibility issues in React components
+    
+    **When to use:**
+    - Before committing code
+    - As part of your CI/CD pipeline
+    - When debugging unexpected behavior
+  </Accordion>
+</AccordionGroup>
+
+## Database Scripts
+
+<AccordionGroup>
+  <Accordion title="db:generate" icon="database">
+    **Command:** `pnpm db:generate`
+    
+    Generates database migration files from your Drizzle schema.
+    
+    ```bash
+    pnpm db:generate
+    ```
+    
+    **What it does:**
+    - Analyzes your Drizzle schema definitions
+    - Compares with the current database state
+    - Generates SQL migration files in `drizzle/` directory
+    - Creates timestamped migration files
+    
+    **When to use:**
+    - After modifying database schema in `lib/db/schema.ts`
+    - Before running migrations
+    - When adding new tables or columns
+    
+    <Info>
+      This doesn't apply migrations - it only generates them. Run `pnpm db:migrate` to apply.
+    </Info>
+  </Accordion>
+  
+  <Accordion title="db:migrate" icon="arrow-right">
+    **Command:** `pnpm db:migrate`
+    
+    Applies pending database migrations to your database.
+    
+    ```bash
+    pnpm db:migrate
+    ```
+    
+    **What it does:**
+    - Runs all pending migration files
+    - Updates your database schema
+    - Tracks applied migrations
+    - Creates/modifies tables and columns
+    
+    **When to use:**
+    - After generating migrations with `pnpm db:generate`
+    - On initial setup
+    - When deploying schema changes
+    - After pulling schema changes from other developers
+    
+    <Warning>
+      Always back up your database before running migrations in production.
+    </Warning>
+  </Accordion>
+  
+  <Accordion title="auth:generate" icon="shield">
+    **Command:** `pnpm auth:generate`
+    
+    Generates Better Auth database schema and types.
+    
+    ```bash
+    pnpm auth:generate
+    ```
+    
+    **What it does:**
+    - Runs the Better Auth CLI
+    - Generates authentication tables schema
+    - Outputs to `lib/db/schema.ts`
+    - Creates TypeScript types for auth tables
+    - Automatically accepts prompts with `--yes` flag
+    
+    **When to use:**
+    - During initial project setup
+    - When updating Better Auth version
+    - When auth configuration changes
+    - As part of `pnpm db:setup`
+    
+    <Info>
+      This script is typically run as part of `pnpm db:setup` rather than manually.
+    </Info>
+  </Accordion>
+  
+  <Accordion title="db:setup" icon="wrench">
+    **Command:** `pnpm db:setup`
+    
+    Complete database setup - generates auth schema, migrations, and applies them.
+    
+    ```bash
+    pnpm db:setup
+    ```
+    
+    **What it does:**
+    - Runs `pnpm auth:generate` (generates Better Auth schema)
+    - Runs `pnpm db:generate` (generates migrations)
+    - Runs `pnpm db:migrate` (applies migrations)
+    - Sets up your database from scratch
+    
+    **When to use:**
+    - **First time setup** after cloning the project
+    - When resetting your database
+    - After pulling major schema changes
+    - In CI/CD environments
+    
+    <Tip>
+      This is the recommended script for initial database setup. It combines all necessary steps in the correct order.
+    </Tip>
+  </Accordion>
+</AccordionGroup>
+
+## Common Workflows
+
+### Initial Project Setup
+
+```bash
+# 1. Install dependencies
+pnpm install
+
+# 2. Set up environment variables
+cp .env.example .env
+# Edit .env with your values
+
+# 3. Set up database
+pnpm db:setup
+
+# 4. Start development server
+pnpm dev
+```
+
+### Making Schema Changes
+
+```bash
+# 1. Modify schema in lib/db/schema.ts
+
+# 2. Generate migration
+pnpm db:generate
+
+# 3. Review the generated migration in drizzle/ directory
+
+# 4. Apply migration
+pnpm db:migrate
+
+# 5. Restart dev server if running
+pnpm dev
+```
+
+### Pre-Deployment Checklist
+
+```bash
+# 1. Format code
+pnpm fmt
+
+# 2. Run linter
+pnpm lint
+
+# 3. Build for production
+pnpm build
+
+# 4. Test production build locally (optional)
+pnpm start
+
+# 5. Deploy to your hosting platform
+```
+
+### Daily Development
+
+```bash
+# Pull latest changes
+git pull
+
+# Install any new dependencies
+pnpm install
+
+# Apply any new migrations
+pnpm db:migrate
+
+# Start development
+pnpm dev
+```
+
+## Script Reference Table
+
+| Script | Command | Purpose | Use Case |
+|--------|---------|---------|----------|
+| `dev` | `pnpm dev` | Start development server | Active development |
+| `build` | `pnpm build` | Build for production | Pre-deployment |
+| `start` | `pnpm start` | Run production server | Test production build |
+| `fmt` | `pnpm fmt` | Format code | Before commits |
+| `lint` | `pnpm lint` | Check code quality | Before commits, CI/CD |
+| `db:generate` | `pnpm db:generate` | Generate migrations | After schema changes |
+| `db:migrate` | `pnpm db:migrate` | Apply migrations | Deploy schema changes |
+| `auth:generate` | `pnpm auth:generate` | Generate auth schema | Initial setup, auth updates |
+| `db:setup` | `pnpm db:setup` | Complete DB setup | First-time setup |
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Build fails with type errors">
+    - Run `pnpm lint` to identify issues
+    - Check that all environment variables are set
+    - Ensure database migrations are up to date
+    - Try deleting `.next` directory and rebuilding
+  </Accordion>
+  
+  <Accordion title="Database migration errors">
+    - Verify `TURSO_DATABASE_URL` is correctly set in `.env`
+    - Check that migrations exist in the `drizzle/` directory
+    - Try running `pnpm db:setup` to regenerate everything
+    - For local development, delete `dev.db` and run `pnpm db:setup`
+  </Accordion>
+  
+  <Accordion title="Development server won't start">
+    - Check if port 3000 is already in use
+    - Verify environment variables in `.env`
+    - Try deleting `node_modules` and running `pnpm install` again
+    - Ensure database is set up with `pnpm db:setup`
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Environment Variables" icon="key" href="/reference/environment-variables">
+    Configure your environment variables
+  </Card>
+  <Card title="Database Setup" icon="database" href="/setup/database">
+    Learn more about database configuration
+  </Card>
+</CardGroup>

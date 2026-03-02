@@ -1,0 +1,418 @@
+---
+title: Input
+description: Text input field component with accessibility and validation support
+icon: 'input-cursor'
+---
+
+The Input component provides a styled text input field with built-in accessibility features, focus states, and error handling. It extends the native HTML input element.
+
+## Installation
+
+The Input component is included by default. To add it to a new project:
+
+```bash
+npx shadcn@latest add input
+```
+
+## Import
+
+```tsx
+import { Input } from "@/components/ui/input"
+```
+
+## Usage
+
+### Basic Input
+
+```tsx
+import { Input } from "@/components/ui/input"
+
+export default function Example() {
+  return <Input type="text" placeholder="Enter text..." />
+}
+```
+
+### With Label
+
+```tsx
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
+export default function Example() {
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor="email">Email</Label>
+      <Input id="email" type="email" placeholder="[email protected]" />
+    </div>
+  )
+}
+```
+
+## Input Types
+
+The Input component supports all standard HTML input types:
+
+### Text
+
+```tsx
+<Input type="text" placeholder="Enter your name" />
+```
+
+### Email
+
+```tsx
+<Input type="email" placeholder="[email protected]" />
+```
+
+### Password
+
+```tsx
+<Input type="password" placeholder="Enter password" />
+```
+
+### Number
+
+```tsx
+<Input type="number" placeholder="Enter amount" min={0} max={100} />
+```
+
+### Tel
+
+```tsx
+<Input type="tel" placeholder="(555) 123-4567" />
+```
+
+### URL
+
+```tsx
+<Input type="url" placeholder="https://example.com" />
+```
+
+### Date
+
+```tsx
+<Input type="date" />
+```
+
+### Time
+
+```tsx
+<Input type="time" />
+```
+
+### Search
+
+```tsx
+<Input type="search" placeholder="Search..." />
+```
+
+## States
+
+### Disabled
+
+```tsx
+<Input disabled placeholder="Disabled input" />
+```
+
+### Read-only
+
+```tsx
+<Input readOnly value="Read-only value" />
+```
+
+### Invalid (Error State)
+
+```tsx
+<Input aria-invalid={true} placeholder="Invalid input" />
+```
+
+The input automatically styles error states when `aria-invalid` is set to `true`:
+- Red border color
+- Red focus ring
+
+## File Input
+
+The Input component has special styling for file inputs:
+
+```tsx
+<Input type="file" />
+```
+
+**Features:**
+- Styled file button
+- Custom text color
+- Proper alignment
+
+## Form Integration
+
+Use with the Form component for validation:
+
+```tsx
+"use client"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+
+const formSchema = z.object({
+  email: z.string().email("Invalid email address"),
+})
+
+export default function EmailForm() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  })
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(console.log)}>
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="Email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Submit</Button>
+      </form>
+    </Form>
+  )
+}
+```
+
+## Props
+
+```tsx
+type InputProps = React.ComponentProps<"input">
+```
+
+The Input component accepts all standard HTML input attributes:
+
+<ParamField path="type" type="string" default="text">
+  Input type (text, email, password, number, etc.)
+</ParamField>
+
+<ParamField path="placeholder" type="string">
+  Placeholder text
+</ParamField>
+
+<ParamField path="value" type="string">
+  Input value (controlled)
+</ParamField>
+
+<ParamField path="defaultValue" type="string">
+  Default value (uncontrolled)
+</ParamField>
+
+<ParamField path="disabled" type="boolean">
+  Disable the input
+</ParamField>
+
+<ParamField path="readOnly" type="boolean">
+  Make input read-only
+</ParamField>
+
+<ParamField path="required" type="boolean">
+  Mark as required
+</ParamField>
+
+<ParamField path="aria-invalid" type="boolean">
+  Mark as invalid (error state styling)
+</ParamField>
+
+## Examples
+
+### Login Form
+
+```tsx
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+
+export default function LoginForm() {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input id="email" type="email" placeholder="[email protected]" />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <Input id="password" type="password" />
+      </div>
+      <Button className="w-full">Sign In</Button>
+    </div>
+  )
+}
+```
+
+### Search Input
+
+```tsx
+import { Input } from "@/components/ui/input"
+import { SearchIcon } from "lucide-react"
+
+export default function SearchInput() {
+  return (
+    <div className="relative">
+      <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+      <Input
+        type="search"
+        placeholder="Search..."
+        className="pl-10"
+      />
+    </div>
+  )
+}
+```
+
+### Input with Button
+
+```tsx
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+
+export default function InputWithButton() {
+  return (
+    <div className="flex gap-2">
+      <Input type="email" placeholder="Enter your email" />
+      <Button>Subscribe</Button>
+    </div>
+  )
+}
+```
+
+### Controlled Input
+
+```tsx
+"use client"
+
+import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
+export default function ControlledInput() {
+  const [value, setValue] = useState("")
+
+  return (
+    <div className="space-y-2">
+      <Label htmlFor="name">Name</Label>
+      <Input
+        id="name"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="Enter your name"
+      />
+      <p className="text-sm text-muted-foreground">
+        You entered: {value}
+      </p>
+    </div>
+  )
+}
+```
+
+## Styling Features
+
+### Focus State
+
+The Input includes a custom focus ring:
+- Border color changes to ring color
+- 3px ring with 50% opacity
+- Smooth transition
+
+### Selection
+
+Text selection is styled with primary colors:
+- Background: primary color
+- Text: primary foreground color
+
+### Dark Mode
+
+Automatic dark mode support:
+- Semi-transparent background in dark mode
+- Adjusted border colors
+- Proper contrast ratios
+
+## Accessibility Features
+
+- **Keyboard navigation**: Full keyboard support
+- **Focus visible**: Clear focus indicators
+- **ARIA support**: Works with `aria-invalid`, `aria-describedby`, etc.
+- **Label association**: Proper `id` and `htmlFor` linking
+- **Disabled state**: Proper disabled styling and behavior
+- **Screen reader**: Semantic HTML input element
+
+## Customization
+
+### Custom Width
+
+```tsx
+<Input className="max-w-sm" placeholder="Custom width" />
+```
+
+### Custom Styling
+
+```tsx
+<Input
+  className="border-blue-500 focus-visible:ring-blue-500"
+  placeholder="Custom colors"
+/>
+```
+
+### Size Variants
+
+```tsx
+{/* Small */}
+<Input className="h-8 text-xs" />
+
+{/* Default */}
+<Input />
+
+{/* Large */}
+<Input className="h-11 text-base" />
+```
+
+## Source Code
+
+View the source: `components/ui/input.tsx:1`
+
+<Accordion title="View Full Source">
+```tsx
+import * as React from "react";
+import { cn } from "@/lib/utils";
+
+function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+  return (
+    <input
+      type={type}
+      data-slot="input"
+      className={cn(
+        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export { Input };
+```
+</Accordion>

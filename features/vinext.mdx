@@ -1,0 +1,329 @@
+---
+title: "Vinext Build System"
+description: "Fast Vite-powered build system for Next.js with full React Server Components support"
+---
+
+Tendon uses [Vinext](https://vinext.vercel.app), a modern build system that replaces Next.js's default webpack-based build with Vite for faster development and production builds.
+
+## What is Vinext?
+
+Vinext is a build system for Next.js that:
+
+- **Uses Vite**: Replaces webpack with Vite for lightning-fast HMR and builds
+- **Supports RSC**: Full React Server Components support
+- **Next.js Compatible**: Works with Next.js 16+ App Router
+- **Zero Config**: Drop-in replacement for Next.js dev/build commands
+- **TypeScript Native**: Built-in TypeScript support
+
+<Tip>
+  Vite provides near-instant hot module replacement (HMR) during development, making the development experience significantly faster than traditional webpack builds.
+</Tip>
+
+## Available Commands
+
+Tendon's `package.json` includes these Vinext-powered scripts:
+
+```json
+{
+  "scripts": {
+    "dev": "vinext dev",
+    "build": "vinext build",
+    "start": "vinext start"
+  }
+}
+```
+
+### Development Mode
+
+Start the development server with hot module replacement:
+
+```bash
+pnpm dev
+```
+
+This command:
+
+- Starts the development server on `http://localhost:3000`
+- Enables hot module replacement (HMR)
+- Watches for file changes
+- Compiles React Server Components
+- Supports both server and client components
+
+<Note>
+  The dev server starts much faster than Next.js's webpack-based development server.
+</Note>
+
+### Production Build
+
+Build the application for production:
+
+```bash
+pnpm build
+```
+
+This command:
+
+- Bundles the application for production
+- Optimizes assets and code
+- Generates static pages where possible
+- Creates server bundles for RSC
+- Minifies JavaScript and CSS
+- Performs tree-shaking
+
+### Production Server
+
+Start the production server:
+
+```bash
+pnpm start
+```
+
+This command:
+
+- Starts the production server
+- Serves the built application
+- Runs on `http://localhost:3000` by default
+
+<Warning>
+  Always run `pnpm build` before `pnpm start`. The start command serves the pre-built application.
+</Warning>
+
+## React Server Components Support
+
+Vinext fully supports React Server Components (RSC), allowing you to write server components seamlessly:
+
+### Server Component
+
+```tsx
+// app/page.tsx - Server Component by default
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
+
+export default async function Page() {
+  // This runs on the server
+  const users = await db.select().from(user);
+
+  return (
+    <div>
+      <h1>Users</h1>
+      <ul>
+        {users.map((user) => (
+          <li key={user.id}>{user.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+### Client Component
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <Button onClick={() => setCount(count + 1)}>Increment</Button>
+    </div>
+  );
+}
+```
+
+### Mixed Components
+
+You can compose server and client components:
+
+```tsx
+// app/page.tsx - Server Component
+import { db } from "@/lib/db";
+import ClientCounter from "./client-counter";
+
+export default async function Page() {
+  const data = await db.query.user.findMany();
+
+  return (
+    <div>
+      <h1>Server Data: {data.length} users</h1>
+      {/* Client component nested in server component */}
+      <ClientCounter />
+    </div>
+  );
+}
+```
+
+## Configuration
+
+Vinext works out of the box with minimal configuration. The Vite configuration is handled internally by Vinext.
+
+### Environment Variables
+
+Environment variables work the same as Next.js:
+
+```bash
+# .env.local
+DATABASE_URL=file:./dev.db
+BETTER_AUTH_SECRET=your-secret
+```
+
+Access them in your code:
+
+```typescript
+// Server-side only
+const dbUrl = process.env.DATABASE_URL;
+
+// Client-side (must be prefixed with NEXT_PUBLIC_)
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+```
+
+<Warning>
+  Only environment variables prefixed with `NEXT_PUBLIC_` are exposed to the browser. All other variables are server-side only.
+</Warning>
+
+## Build Output
+
+After running `pnpm build`, you'll find:
+
+- **`.next/`** - Production build output
+- **Server bundles** - For React Server Components
+- **Client bundles** - For browser JavaScript
+- **Static assets** - Optimized CSS, images, fonts
+
+## Performance Benefits
+
+### Development
+
+- **Instant HMR**: Changes reflect in milliseconds
+- **Fast startup**: Server starts in ~1 second
+- **No full reload**: Only updates changed modules
+- **Better caching**: Vite's dependency pre-bundling
+
+### Production
+
+- **Smaller bundles**: Better tree-shaking than webpack
+- **Faster builds**: Vite's optimized build pipeline
+- **Modern output**: ES modules by default
+- **Code splitting**: Automatic route-based splitting
+
+## Comparison with Next.js
+
+| Feature | Vinext | Next.js (webpack) |
+|---------|--------|------------------|
+| Dev Server Startup | ~1s | ~5-10s |
+| HMR Speed | ~50ms | ~500ms+ |
+| Build Speed | Fast | Moderate |
+| RSC Support | ✅ Full | ✅ Full |
+| App Router | ✅ | ✅ |
+| Streaming | ✅ | ✅ |
+
+## Additional Scripts
+
+Beyond the core Vinext commands, Tendon includes:
+
+### Formatting
+
+```bash
+pnpm fmt
+```
+
+Runs [oxfmt](https://github.com/oxc-project/oxc) for fast code formatting.
+
+### Linting
+
+```bash
+pnpm lint
+```
+
+Runs ESLint with Next.js configuration.
+
+### Database Setup
+
+```bash
+pnpm db:setup
+```
+
+Sets up the database with authentication schema and migrations.
+
+## Deployment
+
+Vinext builds are compatible with standard Next.js deployment platforms:
+
+### Vercel
+
+```bash
+# Deploy to Vercel
+vercel
+```
+
+### Docker
+
+```dockerfile
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
+```
+
+### Self-Hosted
+
+```bash
+# Build
+pnpm build
+
+# Start on port 3000
+pnpm start
+
+# Or specify a port
+PORT=8080 pnpm start
+```
+
+## Troubleshooting
+
+### Dev Server Won't Start
+
+Check if port 3000 is available:
+
+```bash
+lsof -ti:3000 | xargs kill -9
+```
+
+### Build Fails
+
+Clear the build cache:
+
+```bash
+rm -rf .next
+pnpm build
+```
+
+### HMR Not Working
+
+Restart the dev server:
+
+```bash
+# Kill the server (Ctrl+C) and restart
+pnpm dev
+```
+
+## Next Steps
+
+- [Vinext Documentation](https://vinext.vercel.app) - Official Vinext docs
+- [Vite Documentation](https://vite.dev) - Learn about Vite
+- [React Server Components](https://react.dev/reference/rsc/server-components) - RSC guide
+- Explore the Next.js App Router
+- Learn about server actions

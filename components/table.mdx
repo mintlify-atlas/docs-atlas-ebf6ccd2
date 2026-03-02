@@ -1,0 +1,468 @@
+---
+title: Table
+description: Data table component for displaying structured tabular data
+icon: 'table'
+---
+
+The Table component provides a semantic, accessible table structure for displaying data in rows and columns. Built with native HTML table elements and styled for consistency.
+
+## Installation
+
+The Table component is included by default. To add it to a new project:
+
+```bash
+npx shadcn@latest add table
+```
+
+## Import
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+```
+
+## Basic Usage
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
+export default function Example() {
+  return (
+    <Table>
+      <TableCaption>A list of your recent invoices.</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>INV001</TableCell>
+          <TableCell>Paid</TableCell>
+          <TableCell>$250.00</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>INV002</TableCell>
+          <TableCell>Pending</TableCell>
+          <TableCell>$150.00</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  )
+}
+```
+
+## Components
+
+### Table
+
+Root table component with scroll container.
+
+```tsx
+<Table>
+  {/* table content */}
+</Table>
+```
+
+**Features:**
+- Automatic horizontal scroll on overflow
+- Full width by default
+- Responsive container
+
+### TableHeader
+
+Table header section.
+
+```tsx
+<TableHeader>
+  <TableRow>
+    <TableHead>Column 1</TableHead>
+    <TableHead>Column 2</TableHead>
+  </TableRow>
+</TableHeader>
+```
+
+### TableBody
+
+Table body section containing data rows.
+
+```tsx
+<TableBody>
+  <TableRow>
+    <TableCell>Data 1</TableCell>
+    <TableCell>Data 2</TableCell>
+  </TableRow>
+</TableBody>
+```
+
+### TableFooter
+
+Table footer section for summaries.
+
+```tsx
+<TableFooter>
+  <TableRow>
+    <TableCell>Total</TableCell>
+    <TableCell>$400.00</TableCell>
+  </TableRow>
+</TableFooter>
+```
+
+**Styling:**
+- Background color for distinction
+- Border top
+- Font weight medium
+
+### TableRow
+
+Table row component.
+
+```tsx
+<TableRow>
+  <TableCell>Cell 1</TableCell>
+  <TableCell>Cell 2</TableCell>
+</TableRow>
+```
+
+**Features:**
+- Hover effect
+- Border between rows
+- Selection state support
+
+### TableHead
+
+Table header cell.
+
+```tsx
+<TableHead className="w-[100px]">ID</TableHead>
+```
+
+**Styling:**
+- Medium font weight
+- Left aligned by default
+- Whitespace nowrap
+
+### TableCell
+
+Table data cell.
+
+```tsx
+<TableCell>Cell content</TableCell>
+```
+
+**Styling:**
+- Padding for spacing
+- Vertical middle alignment
+- Whitespace nowrap
+
+### TableCaption
+
+Table caption for description.
+
+```tsx
+<TableCaption>Description of the table data.</TableCaption>
+```
+
+**Styling:**
+- Muted text color
+- Small text size
+- Positioned at bottom
+
+## Examples
+
+### Complete Data Table
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
+const invoices = [
+  { invoice: "INV001", status: "Paid", method: "Credit Card", amount: "$250.00" },
+  { invoice: "INV002", status: "Pending", method: "PayPal", amount: "$150.00" },
+  { invoice: "INV003", status: "Unpaid", method: "Bank Transfer", amount: "$350.00" },
+]
+
+export default function InvoiceTable() {
+  return (
+    <Table>
+      <TableCaption>A list of your recent invoices.</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[100px]">Invoice</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Method</TableHead>
+          <TableHead className="text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.map((invoice) => (
+          <TableRow key={invoice.invoice}>
+            <TableCell className="font-medium">{invoice.invoice}</TableCell>
+            <TableCell>{invoice.status}</TableCell>
+            <TableCell>{invoice.method}</TableCell>
+            <TableCell className="text-right">{invoice.amount}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+      <TableFooter>
+        <TableRow>
+          <TableCell colSpan={3}>Total</TableCell>
+          <TableCell className="text-right">$750.00</TableCell>
+        </TableRow>
+      </TableFooter>
+    </Table>
+  )
+}
+```
+
+### With Badges
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+
+export default function StatusTable() {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Order</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Total</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>#3001</TableCell>
+          <TableCell>
+            <Badge>Completed</Badge>
+          </TableCell>
+          <TableCell>$299.00</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>#3002</TableCell>
+          <TableCell>
+            <Badge variant="secondary">Processing</Badge>
+          </TableCell>
+          <TableCell>$149.00</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>#3003</TableCell>
+          <TableCell>
+            <Badge variant="destructive">Cancelled</Badge>
+          </TableCell>
+          <TableCell>$399.00</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  )
+}
+```
+
+### With Actions
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { MoreHorizontalIcon } from "lucide-react"
+
+export default function ActionsTable() {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Name</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Role</TableHead>
+          <TableHead className="w-[50px]"></TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>John Doe</TableCell>
+          <TableCell>[email protected]</TableCell>
+          <TableCell>Admin</TableCell>
+          <TableCell>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreHorizontalIcon />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>Edit</DropdownMenuItem>
+                <DropdownMenuItem>Delete</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  )
+}
+```
+
+### Selectable Rows
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Checkbox } from "@/components/ui/checkbox"
+
+export default function SelectableTable() {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[50px]">
+            <Checkbox />
+          </TableHead>
+          <TableHead>Name</TableHead>
+          <TableHead>Email</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>
+            <Checkbox />
+          </TableCell>
+          <TableCell>John Doe</TableCell>
+          <TableCell>[email protected]</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>
+            <Checkbox />
+          </TableCell>
+          <TableCell>Jane Smith</TableCell>
+          <TableCell>[email protected]</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  )
+}
+```
+
+## Column Alignment
+
+```tsx
+<TableHeader>
+  <TableRow>
+    <TableHead>Left (default)</TableHead>
+    <TableHead className="text-center">Center</TableHead>
+    <TableHead className="text-right">Right</TableHead>
+  </TableRow>
+</TableHeader>
+```
+
+## Fixed Column Width
+
+```tsx
+<TableHead className="w-[100px]">ID</TableHead>
+<TableHead className="w-[200px]">Name</TableHead>
+```
+
+## Responsive Tables
+
+The Table component includes horizontal scroll by default:
+
+```tsx
+<Table>
+  {/* Table automatically scrolls horizontally on small screens */}
+</Table>
+```
+
+For better mobile experience, consider:
+- Hiding less important columns on mobile
+- Using a card layout instead
+- Implementing a responsive data table library
+
+## Accessibility Features
+
+- **Semantic HTML**: Uses proper `table`, `thead`, `tbody`, `tfoot`, `tr`, `th`, `td` elements
+- **Caption**: `TableCaption` provides table description
+- **Scope**: Header cells have implicit scope
+- **Keyboard navigation**: Native table keyboard support
+- **Screen readers**: Proper table structure for screen readers
+
+## Best Practices
+
+### Use TableCaption
+
+Always include a caption for accessibility:
+
+```tsx
+<Table>
+  <TableCaption>List of users in the system</TableCaption>
+  {/* rest of table */}
+</Table>
+```
+
+### Consistent Column Width
+
+Set widths on TableHead for consistent columns:
+
+```tsx
+<TableHead className="w-[100px]">ID</TableHead>
+```
+
+### Right-align Numbers
+
+```tsx
+<TableCell className="text-right">$1,234.56</TableCell>
+```
+
+## Source Code
+
+View the source: `components/ui/table.tsx:1`

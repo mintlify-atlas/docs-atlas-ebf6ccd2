@@ -1,0 +1,427 @@
+---
+title: Card
+description: Flexible container component for grouping related content
+icon: 'square'
+---
+
+The Card component provides a flexible container for grouping and displaying content with a consistent, elevated design. It includes subcomponents for headers, titles, descriptions, content, and footers.
+
+## Installation
+
+The Card component is included by default. To add it to a new project:
+
+```bash
+npx shadcn@latest add card
+```
+
+## Import
+
+```tsx
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+  CardAction
+} from "@/components/ui/card"
+```
+
+## Usage
+
+### Basic Card
+
+```tsx
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+
+export default function Example() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Card Title</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p>Card content goes here.</p>
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+### Complete Card
+
+```tsx
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter
+} from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+
+export default function Example() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Notifications</CardTitle>
+        <CardDescription>
+          You have 3 unread messages.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <p>Message 1</p>
+          <p>Message 2</p>
+          <p>Message 3</p>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button>Mark all as read</Button>
+      </CardFooter>
+    </Card>
+  )
+}
+```
+
+## Components
+
+### Card
+
+The root container component.
+
+```tsx
+<Card className="w-full max-w-md">
+  {/* Card content */}
+</Card>
+```
+
+**Props:** Extends `React.ComponentProps<"div">`
+
+**Styling:**
+- Rounded corners (`rounded-xl`)
+- Border and shadow (`border shadow-sm`)
+- Default spacing (`gap-6 py-6`)
+- Background color via CSS variables
+
+### CardHeader
+
+Header section containing the title and description.
+
+```tsx
+<CardHeader>
+  <CardTitle>Title</CardTitle>
+  <CardDescription>Description</CardDescription>
+</CardHeader>
+```
+
+**Props:** Extends `React.ComponentProps<"div">`
+
+**Features:**
+- Grid layout for title/description and optional action
+- Container query support
+- Automatic spacing and alignment
+
+### CardTitle
+
+Main heading for the card.
+
+```tsx
+<CardTitle>Featured Product</CardTitle>
+```
+
+**Props:** Extends `React.ComponentProps<"div">`
+
+**Styling:**
+- Semibold font weight
+- Zero line height for tight spacing
+
+### CardDescription
+
+Subtitle or description text.
+
+```tsx
+<CardDescription>
+  This is a brief description of the card content.
+</CardDescription>
+```
+
+**Props:** Extends `React.ComponentProps<"div">`
+
+**Styling:**
+- Muted text color
+- Smaller text size (`text-sm`)
+
+### CardAction
+
+Action element positioned in the header.
+
+```tsx
+<CardHeader>
+  <CardTitle>Settings</CardTitle>
+  <CardAction>
+    <Button size="icon" variant="ghost">
+      <MoreVerticalIcon />
+    </Button>
+  </CardAction>
+</CardHeader>
+```
+
+**Props:** Extends `React.ComponentProps<"div">`
+
+**Positioning:**
+- Automatically positioned top-right in header
+- Grid positioning with `col-start-2 row-span-2`
+
+### CardContent
+
+Main content area of the card.
+
+```tsx
+<CardContent>
+  <p>Your main content goes here.</p>
+</CardContent>
+```
+
+**Props:** Extends `React.ComponentProps<"div">`
+
+**Styling:**
+- Horizontal padding (`px-6`)
+
+### CardFooter
+
+Footer section for actions or additional info.
+
+```tsx
+<CardFooter>
+  <Button>Continue</Button>
+</CardFooter>
+```
+
+**Props:** Extends `React.ComponentProps<"div">`
+
+**Styling:**
+- Flex layout for horizontal alignment
+- Horizontal padding (`px-6`)
+- Top padding when preceded by border
+
+## Examples
+
+### Card with Form
+
+```tsx
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
+export default function CardForm() {
+  return (
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle>Create Account</CardTitle>
+        <CardDescription>
+          Enter your details to create a new account.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" type="email" placeholder="[email protected]" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <Input id="password" type="password" />
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button className="w-full">Create Account</Button>
+      </CardFooter>
+    </Card>
+  )
+}
+```
+
+### Card with Action Button
+
+```tsx
+import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { MoreVerticalIcon } from "lucide-react"
+
+export default function CardWithAction() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Project Alpha</CardTitle>
+        <CardDescription>Last updated 2 hours ago</CardDescription>
+        <CardAction>
+          <Button size="icon" variant="ghost">
+            <MoreVerticalIcon />
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <p>Project details and information.</p>
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+### Stats Card
+
+```tsx
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { TrendingUpIcon } from "lucide-react"
+
+export default function StatsCard() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">$45,231.89</div>
+        <p className="text-xs text-muted-foreground flex items-center gap-1">
+          <TrendingUpIcon className="size-4 text-green-500" />
+          +20.1% from last month
+        </p>
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+### Card Grid
+
+```tsx
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+
+export default function CardGrid() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Feature 1</CardTitle>
+          <CardDescription>Description of feature 1</CardDescription>
+        </CardHeader>
+        <CardContent>
+          Content for feature 1
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Feature 2</CardTitle>
+          <CardDescription>Description of feature 2</CardDescription>
+        </CardHeader>
+        <CardContent>
+          Content for feature 2
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Feature 3</CardTitle>
+          <CardDescription>Description of feature 3</CardDescription>
+        </CardHeader>
+        <CardContent>
+          Content for feature 3
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+```
+
+## Composition Pattern
+
+Card components use a compositional pattern. You can mix and match subcomponents:
+
+```tsx
+{/* Minimal card */}
+<Card>
+  <CardContent>
+    Simple content
+  </CardContent>
+</Card>
+
+{/* Card with just header and content */}
+<Card>
+  <CardHeader>
+    <CardTitle>Title Only</CardTitle>
+  </CardHeader>
+  <CardContent>
+    Content here
+  </CardContent>
+</Card>
+
+{/* Full card */}
+<Card>
+  <CardHeader>
+    <CardTitle>Complete Card</CardTitle>
+    <CardDescription>With all sections</CardDescription>
+  </CardHeader>
+  <CardContent>
+    Main content
+  </CardContent>
+  <CardFooter>
+    Footer actions
+  </CardFooter>
+</Card>
+```
+
+## Spacing System
+
+The Card uses a consistent spacing system:
+
+- **Outer spacing**: `py-6` (vertical padding)
+- **Inner spacing**: `gap-6` (gap between sections)
+- **Horizontal padding**: `px-6` (on header, content, footer)
+
+This creates consistent, harmonious spacing throughout the card.
+
+## Accessibility
+
+- Uses semantic HTML (`div` elements with proper structure)
+- Maintains proper heading hierarchy with CardTitle
+- Supports all standard HTML attributes
+- Works with screen readers
+
+## Customization
+
+### Custom Background
+
+```tsx
+<Card className="bg-gradient-to-br from-purple-500 to-pink-500 text-white border-0">
+  <CardHeader>
+    <CardTitle>Gradient Card</CardTitle>
+  </CardHeader>
+  <CardContent>
+    Custom styled card
+  </CardContent>
+</Card>
+```
+
+### Bordered Sections
+
+Add borders to CardHeader or CardFooter:
+
+```tsx
+<Card>
+  <CardHeader className="border-b">
+    <CardTitle>Title</CardTitle>
+  </CardHeader>
+  <CardContent>
+    Content
+  </CardContent>
+  <CardFooter className="border-t">
+    <Button>Action</Button>
+  </CardFooter>
+</Card>
+```
+
+## Source Code
+
+View the source: `components/ui/card.tsx:1`

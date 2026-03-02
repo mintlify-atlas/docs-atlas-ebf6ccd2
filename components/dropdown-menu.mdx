@@ -1,0 +1,451 @@
+---
+title: Dropdown Menu
+description: Contextual menu component with items, checkboxes, radio groups, and submenus
+icon: 'bars'
+---
+
+The Dropdown Menu component provides a versatile contextual menu with support for items, checkboxes, radio groups, separators, and nested submenus. Built on Radix UI's Dropdown Menu primitive.
+
+## Installation
+
+The Dropdown Menu component is included by default. To add it to a new project:
+
+```bash
+npx shadcn@latest add dropdown-menu
+```
+
+## Import
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuShortcut,
+} from "@/components/ui/dropdown-menu"
+```
+
+## Basic Usage
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+
+export default function Example() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">Open Menu</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>Profile</DropdownMenuItem>
+        <DropdownMenuItem>Settings</DropdownMenuItem>
+        <DropdownMenuItem>Logout</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+```
+
+## Components
+
+### DropdownMenu
+
+Root component that manages menu state.
+
+```tsx
+<DropdownMenu open={open} onOpenChange={setOpen}>
+  {/* menu content */}
+</DropdownMenu>
+```
+
+### DropdownMenuTrigger
+
+Button that opens the menu.
+
+```tsx
+<DropdownMenuTrigger asChild>
+  <Button>Open</Button>
+</DropdownMenuTrigger>
+```
+
+### DropdownMenuContent
+
+The menu content container.
+
+```tsx
+<DropdownMenuContent align="end">
+  {/* menu items */}
+</DropdownMenuContent>
+```
+
+**Props:**
+- `align` - "start" | "center" | "end"
+- `sideOffset` - Number (default: 4)
+- `side` - "top" | "right" | "bottom" | "left"
+
+### DropdownMenuItem
+
+Standard menu item.
+
+```tsx
+<DropdownMenuItem onSelect={() => console.log('clicked')}>
+  Menu Item
+</DropdownMenuItem>
+```
+
+**Props:**
+- `inset` - Add left padding for alignment with labeled items
+- `variant` - "default" | "destructive"
+- `disabled` - Disable the item
+- `onSelect` - Callback when selected
+
+### DropdownMenuLabel
+
+Section label.
+
+```tsx
+<DropdownMenuLabel>Settings</DropdownMenuLabel>
+```
+
+### DropdownMenuSeparator
+
+Visual separator between sections.
+
+```tsx
+<DropdownMenuSeparator />
+```
+
+### DropdownMenuCheckboxItem
+
+Checkbox menu item.
+
+```tsx
+<DropdownMenuCheckboxItem checked={checked} onCheckedChange={setChecked}>
+  Show Notifications
+</DropdownMenuCheckboxItem>
+```
+
+### DropdownMenuRadioGroup
+
+Group of radio items.
+
+```tsx
+<DropdownMenuRadioGroup value={value} onValueChange={setValue}>
+  <DropdownMenuRadioItem value="option1">Option 1</DropdownMenuRadioItem>
+  <DropdownMenuRadioItem value="option2">Option 2</DropdownMenuRadioItem>
+</DropdownMenuRadioGroup>
+```
+
+### DropdownMenuSub
+
+Submenu container.
+
+```tsx
+<DropdownMenuSub>
+  <DropdownMenuSubTrigger>More Options</DropdownMenuSubTrigger>
+  <DropdownMenuSubContent>
+    <DropdownMenuItem>Submenu Item</DropdownMenuItem>
+  </DropdownMenuSubContent>
+</DropdownMenuSub>
+```
+
+### DropdownMenuShortcut
+
+Keyboard shortcut indicator.
+
+```tsx
+<DropdownMenuItem>
+  Save
+  <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+</DropdownMenuItem>
+```
+
+## Examples
+
+### User Menu
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+import { UserIcon } from "lucide-react"
+
+export default function UserMenu() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <UserIcon />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>Profile</DropdownMenuItem>
+        <DropdownMenuItem>Billing</DropdownMenuItem>
+        <DropdownMenuItem>Settings</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>Logout</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+```
+
+### With Icons and Shortcuts
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+import { FileIcon, FolderIcon, DownloadIcon } from "lucide-react"
+
+export default function FileMenu() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">File</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem>
+          <FileIcon />
+          New File
+          <DropdownMenuShortcut>⌘N</DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <FolderIcon />
+          New Folder
+          <DropdownMenuShortcut>⌘⇧N</DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <DownloadIcon />
+          Save
+          <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+```
+
+### With Checkboxes
+
+```tsx
+"use client"
+
+import { useState } from "react"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+
+export default function CheckboxMenu() {
+  const [showStatusBar, setShowStatusBar] = useState(true)
+  const [showActivityBar, setShowActivityBar] = useState(false)
+  const [showPanel, setShowPanel] = useState(false)
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">View</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuCheckboxItem
+          checked={showStatusBar}
+          onCheckedChange={setShowStatusBar}
+        >
+          Status Bar
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem
+          checked={showActivityBar}
+          onCheckedChange={setShowActivityBar}
+        >
+          Activity Bar
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem
+          checked={showPanel}
+          onCheckedChange={setShowPanel}
+        >
+          Panel
+        </DropdownMenuCheckboxItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+```
+
+### With Radio Group
+
+```tsx
+"use client"
+
+import { useState } from "react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+
+export default function RadioMenu() {
+  const [position, setPosition] = useState("bottom")
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">Position: {position}</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>Panel Position</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
+          <DropdownMenuRadioItem value="top">Top</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="bottom">Bottom</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="right">Right</DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+```
+
+### With Submenu
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+
+export default function SubmenuExample() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">Options</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem>New Tab</DropdownMenuItem>
+        <DropdownMenuItem>New Window</DropdownMenuItem>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>More Tools</DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem>Save Page As...</DropdownMenuItem>
+            <DropdownMenuItem>Create Shortcut...</DropdownMenuItem>
+            <DropdownMenuItem>Name Window...</DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+```
+
+### Destructive Item
+
+```tsx
+<DropdownMenuItem variant="destructive" onSelect={() => handleDelete()}>
+  Delete
+</DropdownMenuItem>
+```
+
+## Item Variants
+
+### Default
+
+Standard menu item styling.
+
+```tsx
+<DropdownMenuItem>Default Item</DropdownMenuItem>
+```
+
+### Destructive
+
+For dangerous actions like delete.
+
+```tsx
+<DropdownMenuItem variant="destructive">
+  Delete Account
+</DropdownMenuItem>
+```
+
+## Accessibility Features
+
+- **Keyboard navigation**: Arrow keys to navigate, Enter/Space to select
+- **Focus management**: Automatic focus handling
+- **Type ahead**: Type to select items
+- **Escape key**: Close menu
+- **ARIA attributes**: Proper roles and attributes
+- **Screen reader**: Full screen reader support
+
+## Animation
+
+Smooth enter/exit animations:
+- Fade in/out
+- Zoom in/out
+- Slide from direction based on `side` prop
+
+## Positioning
+
+Control menu position with props:
+
+```tsx
+{/* Align to end */}
+<DropdownMenuContent align="end">
+
+{/* Open upward */}
+<DropdownMenuContent side="top">
+
+{/* Custom offset */}
+<DropdownMenuContent sideOffset={10}>
+```
+
+## Source Code
+
+View the source: `components/ui/dropdown-menu.tsx:1`
