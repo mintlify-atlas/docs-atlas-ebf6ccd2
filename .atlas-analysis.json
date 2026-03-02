@@ -1,0 +1,93 @@
+{
+  "projectType": "frontend",
+  "projectName": "Tendon Next.js Template",
+  "projectDescription": "A modern Next.js starter template with authentication, database, and pre-built UI components",
+  "theme": "palm",
+  "primaryColor": "#0ea5e9",
+  "lightColor": "#38bdf8",
+  "darkColor": "#0284c7",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation"
+            ]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "features/authentication",
+              "features/database",
+              "features/ui-components",
+              "features/vinext"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/configuration",
+              "guides/deployment",
+              "guides/customization",
+              "guides/project-structure"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "reference/environment-variables",
+              "reference/scripts",
+              "reference/tech-stack"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Components",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "components/overview"
+            ]
+          },
+          {
+            "group": "UI Components",
+            "pages": [
+              "components/button",
+              "components/card",
+              "components/form",
+              "components/input",
+              "components/dialog",
+              "components/dropdown-menu",
+              "components/tabs",
+              "components/table",
+              "components/toast"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Better Auth integration for email/password authentication",
+    "Drizzle ORM with Turso/libSQL database support",
+    "shadcn/ui component library with 56+ pre-built components",
+    "Vinext build system for optimized Next.js development",
+    "TypeScript and Tailwind CSS configured out of the box",
+    "Local-first development with production-ready deployment"
+  ],
+  "publicApiSurface": [
+    "authClient.signIn",
+    "authClient.signUp",
+    "authClient.signOut",
+    "authClient.useSession",
+    "db (Drizzle client)",
+    "UI components from @/components/ui/*"
+  ]
+}
