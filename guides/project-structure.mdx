@@ -290,10 +290,10 @@ Reusable React hooks.
 Detects mobile viewport:
 
 ```typescript
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 function MyComponent() {
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   
   return <div>{isMobile ? "Mobile" : "Desktop"}</div>;
 }
